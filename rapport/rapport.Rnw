@@ -1,0 +1,164 @@
+\documentclass{scrartcl}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subfig}
+
+\begin{document}
+
+\author{Louie l'orang-outan}
+\title{Analyse de données}
+\subtitle{Étude immobilière de l'île Mercer (Washington, USA)}
+
+\maketitle
+\part*{Description des donnees}
+
+\section{Introduction}
+
+Nous allons étudier un jeu de données immobilières. Il s'agit des ventes de logements à King County, compté contenant la ville de Seattle aux États-Unis. Ce jeu de donnée a été utilisé par un cours Coursera, il semblait tout à fait convenir à une introduction à diverses techniques de l'analyse et traitement de données, sachant l'extreme diversité des méthodes à utiliser, même pour des données modestes. Parmi les avantages de cet ensemble de données, déjà mise en forme, pas d'imputation de données nécessaires, peu de facteurs, une application possible d'une régression linéaire sans être obligé d'utiliser des modèles complexes.
+
+L'objectif de ce projet est d'analyser l'ensemble de donnée avant de faire une modélisation par régression linéaire, cette analyse est une étape indispensable pour développer une intuition sur l'ensemble de données, et donc la création de modèle.
+
+\section{Variables du jeu de données}
+% D'où viennent les données ?
+Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un logement est constitué d'une surface habitable et d'un terrain. À chacun de ces logements sont associés les 21 facteurs suivants: 
+\begin{description}
+\item[id]              Identifiant du logement (ignoré pour l'analyse) 
+\item[date]            Date de vente du logement [Date]
+\item[price]           Prix de vente [Continu]
+\item[bedrooms]        Nombre de chambres [Discret]
+\item[bathrooms]       Ratio entre le nombre de salle de bain et de chambre [Discret]
+\item[sqft-living]     Surface du logement [Continu]
+\item[sqft-lot]        Surface du terrain [Continu]
+\item[floors]          Nombre d'étages dans la maison [Discret]
+\item[waterfront]      Vue sur les quais [Binaire]
+\item[view]            Nombre de fois le logement a été visité [Discret]
+\item[condition]       Appréciation de l'état du logement [Factoriel]
+\item[grade]           Évaluation de la qualité de construction du logement [Factoriel]
+\item[sqft-above]      Surface du logement située sur les étages supérieurs [Continu]
+\item[sqft-basement]   Surface du logement au niveau du sol [Continu]
+\item[yr-built]        Année de construction [Date]
+\item[yr-renovated]    Année de rénovation [Date]
+\item[zipcode]         Zipcode 
+\item[lat]             Lattitude [Coordonnées]
+\item[long]            Longitude [Coordonnées]
+\item[sqft-living2015] Surface du logement en 2015 [Continu]
+\item[sqft-lot2015]    Surface du terrain en 2015 [Continu]
+\end{description}
+
+Petite précision sur le facteur grade. Ce facteur est directement issu de l'administration de King County, en particulier pour la collecte d'impots. Elle établit une classification de 1 à 13 des logements de King County en fonction de la finition du logement. Cela permet d'avoir une vague idée sur la valeur du logement en tant qu'édifice. Il y a donc un ordre entre les niveaux de ce facteur. Néanmoins, ce facteur ne doit pas être pris comme une valeur entièrement objective, car il peut s'agir d'une estimation.
+
+\begin{description}
+\item[1-3] Ne convient presque pas aux standard de construction. A priori une cabane.
+\item[4] Généralement un édifice de mauvaise qualité ayant vielli. Ne rentre pas dans les standards.
+\item[5] Peu cher et peu travaillé. Petit et simple.
+\item[6] Plus petite catégorie qui est aux normes. Matériaux de mauvaise qualité, simplicité.
+\item[7] Construction normale que l'on rencontre sur un terrain habité.
+\item[8] Construction un peu mieux que la moyenne. Meilleurs matériaux dans les finitions.
+\item[9] Meilleure architecture, de bonnes conception et qualité d'éxécution.
+\item[10] Les habitations de ce type sont celles de qualité supérieure, meilleur finition, plus spacieuse et un meilleur agencement des pièces
+\item[11] Conception personnalisée et finitions de qualité supérieure, avec ajout de mobilier en bois massif, de mobiliers fixatif dans les salles de bains et agréments de luxe.
+\item[12] Conception personnalisée et excellent éxécutants. Tous les matériaux sont de qualités supérieurs, et toutes les commodités sont présentes
+\item[13] Généralement, conception et construction personalisées. Proche du niveau du manoir. Important travail pour les cuisines. Grande quantité de plancher en bois et de marbre. Grandes entrées.
+\end{description}
+
+\section{Restriction à Mercer Island}
+
+L'île Mercer fait partie des 100  unités territoriales les plus riches de l'état de Washington. Elle est reliée à la terre qui l'entoure par une voie routière la traversant. On peut l'étudier comme un microsome étant donné le lac qui la sépare de la terre. Comparé à Vashon Island qui ne possède pas de liason terrestre, elle est dynamique et urbanisée.Au sein du jeu de données complet, on peut noter de très grandes disparités territoriales qui ont un impact direct sur le type d'habitation et leurs valeurs. En choisissant un ensemble géographiquement homogène et bien plus petit, on espère pouvoir avoir des conclusions plus précises et faciles à découvrir. 
+Cela doit être vu comme une première étape à l'analyse du jeu de données complet, que l'on ne peut pas mener à cause de contraintes temporelles et manque d'expérience.
+
+
+% Grades 1 - 3
+%   Falls short of minimum building standards. Normally cabin or inferior structure.
+% Grade 4
+%   Generally older low quality construction. Does not meet code.
+% Grade 5
+%   Lower construction costs and workmanship. Small, simple design.
+% Grade 6
+%   Lowest grade currently meeting building codes. Low quality materials, simple designs.
+% Grade 7
+%   Average grade of construction and design. Commonly seen in plats and older subdivisions.
+% Grade 8
+%   Just above average in construction and design. Usually better materials in both the exterior and interior finishes.
+% Grade 9
+%   Better architectural design, with extra exterior and interior design and quality.
+% Grade 10
+%   Homes of this quality generally have high quality features. Finish work is better, and more design quality is seen in the floor plans and larger square footage.
+% Grade 11
+%   Custom design and higher quality finish work, with added amenities of solid woods, bathroom fixtures and more luxurious options.
+% Grade 12
+%   Custom design and excellent builders. All materials are of the highest quality and all conveniences are present.
+% Grade 13
+%   Generally custom designed and built. Approaching the Mansion level. Large amount of highest quality cabinet work, wood trim and marble; large entries.
+
+\section{Répartition des valeurs}
+
+% chargement des bibliothèques
+<<echo=FALSE>>=
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+theme_set(theme_bw())
+@ 
+
+% chargement du jeu de données
+% transformation adéquate
+<<echo=FALSE>>=
+D <- read.csv("../donnees/kc_house_data.csv")
+D$date <- as.Date(sapply(as.character(D$date), function(x){ paste(substr(x, 0, 4), substr(x, 5, 6), substr(x, 7, 8), sep = "-") }, USE.NAMES = F))
+
+D$yr_built <- as.Date(paste(D$yr_built, "01-01", sep = "-"))
+D$yr_renovated <- as.Date(paste(D$yr_renovated, "01-01", sep = "-"))
+
+D$date <- as.integer(D$date)
+D$yr_built<- as.integer(D$yr_built)
+D$yr_renovated<- as.integer(D$yr_renovated)
+
+D$d_built <- D$date - D$yr_built
+D$d_renovated <- D$date - D$yr_renovated
+
+D$date <- NULL
+D$yr_built <- NULL
+D$yr_renovated <- NULL
+D$id <- NULL
+
+D$zipcode <- as.factor(D$zipcode)
+@ 
+
+% {Prix}
+% {Surface}
+% {État des logements}
+% {Données Géographiques}
+% {Données Géographiques}
+<<prix, echo=FALSE, fig.cap='Prix', fig.subcap=c('Répartition en échelle log', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
+#ggplot(D, aes(price)) + geom_histogram(binwidth=10^5)
+ggplot(D, aes(log(price))) + geom_histogram(bins=30)
+
+sortedPrice <- sort(D$price)
+qplot(1:nrow(D)/nrow(D), cumsum(sortedPrice) / sum(sortedPrice), xlab="Pourcentage de la population", ylab="Richesse cumulée")
+@ 
+
+
+% Moyenne 
+% Medianne
+% Coefficient assymétrie/applatissement
+% Moustache
+% Histogramme
+% Courbe de Lorentz/Coefficient de Gini -> concentration des surfaces 
+
+% faire une comparaison des analyses monovariéees entre ces variables 
+% Moyenne, Médiane, Coefficient assymétrie applatissement
+% Moustache
+% Histogramme 
+% Courbe de Lorentz/Coefficient de Gini -> a priori le coff de Gini est mieux car plus parlant
+
+
+
+% Le rapport entre les différentes modalités
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
