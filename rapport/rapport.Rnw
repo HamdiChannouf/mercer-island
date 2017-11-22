@@ -10,6 +10,7 @@
 \subtitle{Étude immobilière de l'île Mercer (Washington, USA)}
 
 \maketitle
+
 \part*{Description des donnees}
 
 \section{Introduction}
@@ -93,7 +94,7 @@ Cela doit être vu comme une première étape à l'analyse du jeu de données co
 \section{Répartition des valeurs}
 
 % chargement des bibliothèques
-<<echo=FALSE>>=
+<<echo=FALSE, output=FALSE>>=
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -103,7 +104,7 @@ theme_set(theme_bw())
 
 % chargement du jeu de données
 % transformation adéquate
-<<echo=FALSE>>=
+<<echo=FALSE, output=FALSE>>=
 D <- read.csv("../donnees/kc_house_data.csv")
 D$date <- as.Date(sapply(as.character(D$date), function(x){ paste(substr(x, 0, 4), substr(x, 5, 6), substr(x, 7, 8), sep = "-") }, USE.NAMES = F))
 
@@ -157,8 +158,3 @@ qplot(1:nrow(D)/nrow(D), cumsum(sortedPrice) / sum(sortedPrice), xlab="Pourcenta
 % Le rapport entre les différentes modalités
 
 \end{document}
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: t
-%%% End:
