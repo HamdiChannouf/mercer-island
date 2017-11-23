@@ -94,20 +94,28 @@ Cela doit être vu comme une première étape à l'analyse du jeu de données co
 \section{Répartition des valeurs}
 
 % chargement des bibliothèques
-<<echo=FALSE, output=FALSE>>=
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+<<echo=FALSE>>=
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, echo=FALSE)
+@ 
+
+<<>>=
+library(tidyverse)
+library(rgdal)
+library(corrplot)
+library(ineq)
+#library(raster)
 
 theme_set(theme_bw())
 @ 
 
 % chargement du jeu de données
 % transformation adéquate
-<<echo=FALSE, output=FALSE>>=
+<<message=FALSE,warning=FALSE>>=
 D <- read.csv("../donnees/kc_house_data.csv")
 D$date <- as.Date(sapply(as.character(D$date), function(x){ paste(substr(x, 0, 4), substr(x, 5, 6), substr(x, 7, 8), sep = "-") }, USE.NAMES = F))
 
+## transformation des variables
+## 
 D$yr_built <- as.Date(paste(D$yr_built, "01-01", sep = "-"))
 D$yr_renovated <- as.Date(paste(D$yr_renovated, "01-01", sep = "-"))
 
@@ -124,6 +132,24 @@ D$yr_renovated <- NULL
 D$id <- NULL
 
 D$zipcode <- as.factor(D$zipcode)
+
+M <- filter(D, zipcode == 98040)
+@ 
+
+% chargement de la carte
+<<results="hide">>=
+map_king_county <- readOGR(dsn="../donnees/map", layer="Zipcodes_for_King_County_and_Surrounding_Area_Shorelines__zipcode_shore_area")
+map_mercer <- subset(map_king_county, ZIPCODE == "98040")
+
+pts <- SpatialPointsDataFrame(select(M, long, lat),
+                              select(M, -c(long, lat)),
+                              proj4string=CRS(proj4string(map_mercer)))
+@ 
+
+<<>>=
+map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon(fill="lightblue") 
+
+map_plot + geom_point(data=as.data.frame(pts@coords), aes(long, lat))
 @ 
 
 % {Prix}
@@ -131,12 +157,32 @@ D$zipcode <- as.factor(D$zipcode)
 % {État des logements}
 % {Données Géographiques}
 % {Données Géographiques}
-<<prix, echo=FALSE, fig.cap='Prix', fig.subcap=c('Répartition en échelle log', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
-#ggplot(D, aes(price)) + geom_histogram(binwidth=10^5)
-ggplot(D, aes(log(price))) + geom_histogram(bins=30)
+<<price, fig.cap='Prix', fig.subcap=c('Répartition en échelle log', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
+#ggplot(M, aes(price)) + geom_histogram(binwidth=10^5)
+ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
 
-sortedPrice <- sort(D$price)
-qplot(1:nrow(D)/nrow(D), cumsum(sortedPrice) / sum(sortedPrice), xlab="Pourcentage de la population", ylab="Richesse cumulée")
+
+ggplot() + geom_line(aes(x=seq(nrow(M))/nrow(M),
+                         y=cumsum(sort(M$price))/sum(M$price))) +
+    xlab("Pourcentage de la population") +
+    ylab("Richesse cumulée")
+@ 
+
+<<sqft_living, fig.cap='Surface habitée', fig.subcap=c('Répartition en échellle linéaire', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
+
+ggplot(M, aes(sqft_living)) + geom_histogram(bins=30)
+
+sqft_living_G <- ineq(M$sqft_living)
+ggplot(data.frame(lp=seq(nrow(M))/nrow(M),
+                  cp=cumsum(sort(M$sqft_living))/sum(M$sqft_living)),
+       aes(lp)) +
+    geom_line(aes(lp, cp), col="red", lty="dashed", size=1.2) +
+    geom_ribbon(aes(ymin=cp, ymax=lp), fill="yellow") + 
+    geom_segment(aes(x=0, y=0, xend=1, yend=1), col="red", lty="dashed") +
+    xlim(0, 1) +
+    xlab("Pourcentage de la population") +
+    ylab("Richesse cumulée") +
+    annotate("text", x=0.5, y=0.425, label=paste("italic(G) == ", round(sqft_living_G, 2)), parse=TRUE, size=9) 
 @ 
 
 
@@ -156,5 +202,9 @@ qplot(1:nrow(D)/nrow(D), cumsum(sortedPrice) / sum(sortedPrice), xlab="Pourcenta
 
 
 % Le rapport entre les différentes modalités
+
+<<correlation>>=
+corrplot(cor(select(M, -c(view, condition, grade, lat, long, d_built, d_renovated, zipcode, waterfront))), type="upper", order="hclust", addCoef.col="black")
+@ 
 
 \end{document}
