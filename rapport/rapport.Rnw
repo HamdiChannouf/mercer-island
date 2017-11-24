@@ -170,7 +170,7 @@ affiche_lorentz <- function(v)
         xlim(0, 1) +
         xlab("Pourcentage de la population") +
         ylab("Richesse cumulée") +
-        geom_label(data=data.frame(x=0.5, y=0.425, label=paste("italic(G) ==", round(sqft_living_G, 2))), aes(x=x, y=y, label=label), parse=TRUE, size=9)
+        annotate("text", x=0.25, y=0.775, label=paste("italic(G) ==", round(sqft_living_G, 2)), parse=TRUE, size=10)
 }
 @ 
 
