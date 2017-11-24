@@ -157,32 +157,48 @@ map_plot + geom_point(data=as.data.frame(pts@coords), aes(long, lat))
 % {État des logements}
 % {Données Géographiques}
 % {Données Géographiques}
+
+<<affiche_lorentz>>=
+affiche_lorentz <- function(v)
+{
+    sqft_living_G <- ineq(v)
+    ggplot(data.frame(lp=seq(length(v))/length(v),
+                      cp=cumsum(sort(v))/sum(v)),
+           aes(lp)) +
+        geom_line(aes(lp, cp), col="red", lty="dashed", size=1.2) +
+        geom_ribbon(aes(ymin=cp, ymax=lp), fill="yellow") +
+        geom_segment(aes(x=0, y=0, xend=1, yend=1), col="red", lty="dashed") +
+        xlim(0, 1) +
+        xlab("Pourcentage de la population") +
+        ylab("Richesse cumulée") +
+        geom_label(data=data.frame(x=0.5, y=0.425, label=paste("italic(G) ==", round(sqft_living_G, 2))), aes(x=x, y=y, label=label), parse=TRUE, size=9)
+}
+@ 
+
 <<price, fig.cap='Prix', fig.subcap=c('Répartition en échelle log', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
 #ggplot(M, aes(price)) + geom_histogram(binwidth=10^5)
 ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
 
 
-ggplot() + geom_line(aes(x=seq(nrow(M))/nrow(M),
-                         y=cumsum(sort(M$price))/sum(M$price))) +
-    xlab("Pourcentage de la population") +
-    ylab("Richesse cumulée")
+affiche_lorentz(M$price)
 @ 
 
 <<sqft_living, fig.cap='Surface habitée', fig.subcap=c('Répartition en échellle linéaire', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
 
 ggplot(M, aes(sqft_living)) + geom_histogram(bins=30)
 
-sqft_living_G <- ineq(M$sqft_living)
-ggplot(data.frame(lp=seq(nrow(M))/nrow(M),
-                  cp=cumsum(sort(M$sqft_living))/sum(M$sqft_living)),
-       aes(lp)) +
-    geom_line(aes(lp, cp), col="red", lty="dashed", size=1.2) +
-    geom_ribbon(aes(ymin=cp, ymax=lp), fill="yellow") + 
-    geom_segment(aes(x=0, y=0, xend=1, yend=1), col="red", lty="dashed") +
-    xlim(0, 1) +
-    xlab("Pourcentage de la population") +
-    ylab("Richesse cumulée") +
-    annotate("text", x=0.5, y=0.425, label=paste("italic(G) == ", round(sqft_living_G, 2)), parse=TRUE, size=9) 
+## sqft_living_G <- ineq(M$sqft_living)    
+## ggplot(data.frame(lp=seq(nrow(M))/nrow(M),
+##                   cp=cumsum(sort(M$sqft_living))/sum(M$sqft_living)),
+##        aes(lp)) +
+##     geom_line(aes(lp, cp), col="red", lty="dashed", size=1.2) +
+##     geom_ribbon(aes(ymin=cp, ymax=lp), fill="yellow") + 
+##     geom_segment(aes(x=0, y=0, xend=1, yend=1), col="red", lty="dashed") +
+##     xlim(0, 1) +
+##     xlab("Pourcentage de la population") +
+##     ylab("Richesse cumulée") +
+##     annotate("text", x=0.5, y=0.425, label=paste("italic(G) == ", round(sqft_living_G, 2)), parse=TRUE, size=9) 
+affiche_lorentz(M$sqft_living)
 @ 
 
 
