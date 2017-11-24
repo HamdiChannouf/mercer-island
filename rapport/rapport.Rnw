@@ -100,12 +100,11 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE, echo=FALSE)
 
 <<>>=
 library(tidyverse)
+library(cowplot)
 library(rgdal)
 library(corrplot)
 library(ineq)
 #library(raster)
-
-theme_set(theme_bw())
 @ 
 
 % chargement du jeu de données
