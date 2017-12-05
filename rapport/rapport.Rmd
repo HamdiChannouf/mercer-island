@@ -140,7 +140,7 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price))
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3)
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
 ```
 
 ```{r affiche-lorentz}
