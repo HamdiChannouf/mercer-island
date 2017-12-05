@@ -99,6 +99,8 @@ D$yr_renovated <- as.Date(ifelse(D$yr_renovated==0, NA, paste(D$yr_renovated, "0
 
 D$zipcode <- as.factor(D$zipcode)
 D$waterfront <- as.factor(D$waterfront)
+D$grade <- factor(D$grade)
+D$condition <- factor(D$condition)
 
 M <- filter(D, zipcode == 98040)
 ```
@@ -120,7 +122,7 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=3)
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5, outlier.colour="red") ,shape=23, size=3)
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=3)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
 
@@ -215,4 +217,10 @@ M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
 M %>% ggplot() + geom_point(aes(sqft_living, bathrooms))
 
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living))
+
+M %>% ggplot() + geom_boxplot(aes(grade, sqft_living15))
+M %>% ggplot() + geom_boxplot(aes(grade, sqft_living))
+
+M %>% ggplot() + geom_boxplot(aes(sqft_living, sqft_living15))
 ```
