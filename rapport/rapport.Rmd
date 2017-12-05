@@ -2,6 +2,12 @@
 title: Analyse de Données
 subtitle: Étude immobilière de l'île Mercer (Washington, USA)
 author: Louie l'orang-outan
+output:
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    self_contained: true
+    toc: true
 ---
 
 ## Introduction
