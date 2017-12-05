@@ -28,7 +28,7 @@ Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un l
 * date:            Date de vente du logement [Date]
 * price:           Prix de vente [Continu]
 * bedrooms:        Nombre de chambres [Discret]
-* bathrooms:       Ratio entre le nombre de salle de bain et de chambre [Discret]
+* bathrooms:       Ratio entre le nombre de salle de bain et de chambre
 * sqft-living:     Surface du logement [Continu]
 * sqft-lot:        Surface du terrain [Continu]
 * floors:          Nombre d'étages dans la maison [Discret]
@@ -37,7 +37,7 @@ Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un l
 * condition:       Appréciation de l'état du logement [Factoriel]
 * grade:           Évaluation de la qualité de construction du logement [Factoriel]
 * sqft-above:      Surface du logement située sur les étages supérieurs [Continu]
-* sqft-basement:   Surface du logement au niveau du sol [Continu]
+* sqft-basement:   Surface du logement au niveau du sous-sol [Continu]
 * yr-built:        Année de construction [Date]
 * yr-renovated:    Année de rénovation [Date]
 * zipcode:         Zipcode 
@@ -141,6 +141,8 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price))
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_living15/sqft_basement), shape=23, size=3) + scale_shape_identity()
 ```
 
 ```{r affiche-lorentz}
@@ -174,6 +176,25 @@ affiche_lorentz(M$sqft_living)
 ```
 
 ```{r}
+ggplot(M, aes(sqrt(sqft_living15))) + geom_histogram(bins=30)
+
+affiche_lorentz(M$sqft_living15)
+```
+
+```{r}
+ggplot(M, aes(sqrt(sqft_lot))) + geom_histogram(bins=30)
+
+affiche_lorentz(M$sqft_lot)
+```
+
+```{r}
+ggplot(M, aes(sqrt(sqft_lot15))) + geom_histogram(bins=30)
+
+affiche_lorentz(M$sqft_lot15)
+```
+
+
+```{r}
 corrplot(cor(M %>% select(-c(view, condition, grade, 
                           lat, long, 
                           date, yr_built, yr_renovated,
@@ -183,4 +204,17 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
              mutate(logPrice = log10(price)) %>%
              select(-price)),
          type="upper", order="hclust", addCoef.col="black")
+```
+
+```{r}
+ggplot(M) + geom_point(aes(sqft_living15, log10(price)))
+```
+
+```{r}
+ggplot(M) + geom_boxplot(aes(factor(bedrooms), bathrooms))
+ggplot(M) + geom_point(aes(sqft_living, bathrooms))
+
+ggplot(M) + geom_boxplot(aes(factor(bedrooms), price))
+
+ggplot(M) + geom_point(aes(sqft_living15, sqft_basement))
 ```
