@@ -111,26 +111,18 @@ library(ineq)
 % transformation adéquate
 <<message=FALSE,warning=FALSE>>=
 D <- read.csv("../donnees/kc_house_data.csv")
+
+
 D$date <- as.Date(sapply(as.character(D$date), function(x){ paste(substr(x, 0, 4), substr(x, 5, 6), substr(x, 7, 8), sep = "-") }, USE.NAMES = F))
 
 ## transformation des variables
 ## 
 D$yr_built <- as.Date(paste(D$yr_built, "01-01", sep = "-"))
-D$yr_renovated <- as.Date(paste(D$yr_renovated, "01-01", sep = "-"))
-
-D$date <- as.integer(D$date)
-D$yr_built<- as.integer(D$yr_built)
-D$yr_renovated<- as.integer(D$yr_renovated)
-
-D$d_built <- D$date - D$yr_built
-D$d_renovated <- D$date - D$yr_renovated
-
-D$date <- NULL
-D$yr_built <- NULL
-D$yr_renovated <- NULL
-D$id <- NULL
+#D$yr_renovated 
+D$yr_renovated <- as.Date(ifelse(D$yr_renovated==0, NA, paste(D$yr_renovated, "01-01", sep="-")))
 
 D$zipcode <- as.factor(D$zipcode)
+D$waterfront <- as.factor(D$waterfront)
 
 M <- filter(D, zipcode == 98040)
 @ 
@@ -145,10 +137,37 @@ pts <- SpatialPointsDataFrame(select(M, long, lat),
                               proj4string=CRS(proj4string(map_mercer)))
 @ 
 
-<<>>=
-map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon(fill="lightblue") 
+<<comparaison_prix_metre>>=
+map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon()
 
-map_plot + geom_point(data=as.data.frame(pts@coords), aes(long, lat))
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5, outlier.colour="red") ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3)
+
 @ 
 
 % {Prix}
@@ -182,9 +201,9 @@ ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
 affiche_lorentz(M$price)
 @ 
 
-<<sqft_living, fig.cap='Surface habitée', fig.subcap=c('Répartition en échellle linéaire', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
+<<sqft_living, fig.cap='Surface habitée', fig.subcap=c('Répartition (racine carrée)', 'Courbe de Lorentz'), out.width='.5\\linewidth'>>=
 
-ggplot(M, aes(sqft_living)) + geom_histogram(bins=30)
+ggplot(M, aes(sqrt(sqft_living))) + geom_histogram(bins=30)
 
 ## sqft_living_G <- ineq(M$sqft_living)    
 ## ggplot(data.frame(lp=seq(nrow(M))/nrow(M),
@@ -219,7 +238,15 @@ affiche_lorentz(M$sqft_living)
 % Le rapport entre les différentes modalités
 
 <<correlation>>=
-corrplot(cor(select(M, -c(view, condition, grade, lat, long, d_built, d_renovated, zipcode, waterfront))), type="upper", order="hclust", addCoef.col="black")
+corrplot(cor(M %>% select(-c(view, condition, grade, 
+                          lat, long, 
+                          date, yr_built, yr_renovated,
+                          id, 
+                          zipcode, 
+                          waterfront)) %>%
+             mutate(logPrice = log10(price)) %>%
+             select(-price)),
+         type="upper", order="hclust", addCoef.col="black")
 @ 
 
 \end{document}
