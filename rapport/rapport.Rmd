@@ -1,0 +1,180 @@
+---
+title: Analyse de Données
+subtitle: Étude immobilière de l'île Mercer (Washington, USA)
+author: Louie l'orang-outan
+---
+
+## Introduction
+
+Nous allons étudier un jeu de données immobilières. Il s'agit des ventes de logements à King County, compté contenant la ville de Seattle aux États-Unis. Ce jeu de donnée a été utilisé par un cours Coursera, il semblait tout à fait convenir à une introduction à diverses techniques de l'analyse et traitement de données, sachant l'extreme diversité des méthodes à utiliser, même pour des données modestes. Parmi les avantages de cet ensemble de données, déjà mise en forme, pas d'imputation de données nécessaires, peu de facteurs, une application possible d'une régression linéaire sans être obligé d'utiliser des modèles complexes.
+
+L'objectif de ce projet est d'analyser l'ensemble de donnée avant de faire une modélisation par régression linéaire, cette analyse est une étape indispensable pour développer une intuition sur l'ensemble de données, et donc la création de modèle.
+
+## Variables du jeu de données
+
+Toto 
+id
+  ~ oueou 
+
+Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un logement est constitué d'une surface habitable et d'un terrain. À chacun de ces logements sont associés les 21 facteurs suivants: 
+
+* id:              Identifiant du logement (ignoré pour l'analyse) 
+* date:            Date de vente du logement [Date]
+* price:           Prix de vente [Continu]
+* bedrooms:        Nombre de chambres [Discret]
+* bathrooms:       Ratio entre le nombre de salle de bain et de chambre [Discret]
+* sqft-living:     Surface du logement [Continu]
+* sqft-lot:        Surface du terrain [Continu]
+* floors:          Nombre d'étages dans la maison [Discret]
+* waterfront:      Vue sur les quais [Binaire]
+* view:            Nombre de fois le logement a été visité [Discret]
+* condition:       Appréciation de l'état du logement [Factoriel]
+* grade:           Évaluation de la qualité de construction du logement [Factoriel]
+* sqft-above:      Surface du logement située sur les étages supérieurs [Continu]
+* sqft-basement:   Surface du logement au niveau du sol [Continu]
+* yr-built:        Année de construction [Date]
+* yr-renovated:    Année de rénovation [Date]
+* zipcode:         Zipcode 
+* lat:             Lattitude [Coordonnées]
+* long:            Longitude [Coordonnées]
+* sqft-living2015: Surface du logement en 2015 [Continu]
+* sqft-lot2015:    Surface du terrain en 2015 [Continu]
+
+Petite précision sur le facteur grade. Ce facteur est directement issu de l'administration de King County, en particulier pour la collecte d'impots. Elle établit une classification de 1 à 13 des logements de King County en fonction de la finition du logement. Cela permet d'avoir une vague idée sur la valeur du logement en tant qu'édifice. Il y a donc un ordre entre les niveaux de ce facteur. Néanmoins, ce facteur ne doit pas être pris comme une valeur entièrement objective, car il peut s'agir d'une estimation.
+
+* [1-3] Ne convient presque pas aux standard de construction. A priori une cabane.
+* [4] Généralement un édifice de mauvaise qualité ayant vielli. Ne rentre pas dans les standards.
+* [5] Peu cher et peu travaillé. Petit et simple.
+* [6] Plus petite catégorie qui est aux normes. Matériaux de mauvaise qualité, simplicité.
+* [7] Construction normale que l'on rencontre sur un terrain habité.
+* [8] Construction un peu mieux que la moyenne. Meilleurs matériaux dans les finitions.
+* [9] Meilleure architecture, de bonnes conception et qualité d'éxécution.
+* [10] Les habitations de ce type sont celles de qualité supérieure, meilleur finition, plus spacieuse et un meilleur agencement des pièces
+* [11] Conception personnalisée et finitions de qualité supérieure, avec ajout de mobilier en bois massif, de mobiliers fixatif dans les salles de bains et agréments de luxe.
+* [12] Conception personnalisée et excellent éxécutants. Tous les matériaux sont de qualités supérieurs, et toutes les commodités sont présentes
+* [13] Généralement, conception et construction personalisées. Proche du niveau du manoir. Important travail pour les cuisines. Grande quantité de plancher en bois et de marbre. Grandes entrées.
+
+## Restriction à Mercer Island
+
+L'île Mercer fait partie des 100  unités territoriales les plus riches de l'état de Washington. Elle est reliée à la terre qui l'entoure par une voie routière la traversant. On peut l'étudier comme un microsome étant donné le lac qui la sépare de la terre. Comparé à Vashon Island qui ne possède pas de liason terrestre, elle est dynamique et urbanisée.Au sein du jeu de données complet, on peut noter de très grandes disparités territoriales qui ont un impact direct sur le type d'habitation et leurs valeurs. En choisissant un ensemble géographiquement homogène et bien plus petit, on espère pouvoir avoir des conclusions plus précises et faciles à découvrir. 
+Cela doit être vu comme une première étape à l'analyse du jeu de données complet, que l'on ne peut pas mener à cause de contraintes temporelles et manque d'expérience.
+
+## Répartition des valeurs
+
+```{r, echo=FALSE}
+library(knitr)
+library(kableExtra)
+options(knitr.table.format = "html")
+opts_chunk$set(warning=FALSE,
+               echo=FALSE,
+               message=FALSE,
+               fig.align="center")
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(rgdal)
+library(corrplot)
+library(ineq)
+```
+
+```{r}
+D <- read.csv("../donnees/kc_house_data.csv")
+
+
+D$date <- as.Date(sapply(as.character(D$date), function(x){ paste(substr(x, 0, 4), substr(x, 5, 6), substr(x, 7, 8), sep = "-") }, USE.NAMES = F))
+
+## transformation des variables
+## 
+D$yr_built <- as.Date(paste(D$yr_built, "01-01", sep = "-"))
+#D$yr_renovated 
+D$yr_renovated <- as.Date(ifelse(D$yr_renovated==0, NA, paste(D$yr_renovated, "01-01", sep="-")))
+
+D$zipcode <- as.factor(D$zipcode)
+D$waterfront <- as.factor(D$waterfront)
+
+M <- filter(D, zipcode == 98040)
+```
+```{r, results="hide"}
+map_king_county <- readOGR(dsn="../donnees/map", layer="Zipcodes_for_King_County_and_Surrounding_Area_Shorelines__zipcode_shore_area")
+map_mercer <- subset(map_king_county, ZIPCODE == "98040")
+
+pts <- SpatialPointsDataFrame(select(M, long, lat),
+                              select(M, -c(long, lat)),
+                              proj4string=CRS(proj4string(map_mercer)))
+```
+
+```{r}
+map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon()
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5, outlier.colour="red") ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3)
+```
+
+```{r affiche-lorentz}
+affiche_lorentz <- function(v)
+{
+    sqft_living_G <- ineq(v)
+    ggplot(data.frame(lp=seq(length(v))/length(v),
+                      cp=cumsum(sort(v))/sum(v)),
+           aes(lp)) +
+        geom_line(aes(lp, cp), col="red", lty="dashed", size=1.2) +
+        geom_ribbon(aes(ymin=cp, ymax=lp), fill="yellow") +
+        geom_segment(aes(x=0, y=0, xend=1, yend=1), col="red", lty="dashed") +
+        xlim(0, 1) +
+        xlab("Pourcentage de la population") +
+        ylab("Richesse cumulée") +
+        annotate("text", x=0.25, y=0.775, label=paste("italic(G) ==", round(sqft_living_G, 2)), parse=TRUE, size=10)
+}
+```
+
+```{r}
+ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
+
+
+affiche_lorentz(M$price)
+```
+
+```{r}
+ggplot(M, aes(sqrt(sqft_living))) + geom_histogram(bins=30)
+
+affiche_lorentz(M$sqft_living)
+```
+
+```{r}
+corrplot(cor(M %>% select(-c(view, condition, grade, 
+                          lat, long, 
+                          date, yr_built, yr_renovated,
+                          id, 
+                          zipcode, 
+                          waterfront)) %>%
+             mutate(logPrice = log10(price)) %>%
+             select(-price)),
+         type="upper", order="hclust", addCoef.col="black")
+```
