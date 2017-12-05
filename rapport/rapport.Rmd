@@ -122,8 +122,6 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5, outlier.colour="red") ,shape=23, size=3)
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5) ,shape=23, size=3)
-
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
@@ -142,7 +140,9 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_living15/sqft_basement), shape=23, size=3) + scale_shape_identity()
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqrt(sqft_basement)), shape=23, size=3) + scale_shape_identity()
 ```
 
 ```{r affiche-lorentz}
@@ -207,14 +207,12 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 ```
 
 ```{r}
-ggplot(M) + geom_point(aes(sqft_living15, log10(price)))
+M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
 ```
 
 ```{r}
-ggplot(M) + geom_boxplot(aes(factor(bedrooms), bathrooms))
-ggplot(M) + geom_point(aes(sqft_living, bathrooms))
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
+M %>% ggplot() + geom_point(aes(sqft_living, bathrooms))
 
-ggplot(M) + geom_boxplot(aes(factor(bedrooms), price))
-
-ggplot(M) + geom_point(aes(sqft_living15, sqft_basement))
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
 ```
