@@ -205,18 +205,60 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 ```
 
 ```{r}
+
+M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
+M %>% ggplot() + geom_histogram(aes((sqft_living - sqft_living15)/sqft_living))
+M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living))
+
 M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
+M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
+
+M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price)))
+M %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
 ```
 
 ```{r}
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
 M %>% ggplot() + geom_point(aes(sqft_living, bathrooms))
+M %>% ggplot() + geom_point(aes(bathrooms, log10(price)))
 
-M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living15))
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living))
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
 
 M %>% ggplot() + geom_boxplot(aes(grade, sqft_living15))
 M %>% ggplot() + geom_boxplot(aes(grade, sqft_living))
+M %>% ggplot() + geom_boxplot(aes(grade, price))
 
-M %>% ggplot() + geom_boxplot(aes(sqft_living, sqft_living15))
+M %>% ggplot() + geom_boxplot(aes(condition, sqft_living15))
+M %>% ggplot() + geom_boxplot(aes(condition, sqft_living))
+M %>% ggplot() + geom_boxplot(aes(condition, price))
+
+M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
+M %>% ggplot()+ geom_point(aes(yr_built, log10(price)))
+M %>% ggplot()+ geom_point(aes(yr_renovated, log10(price)))
 ```
+
+```{r}
+regression <- (lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M))
+summary(regression)
+```
+
+```{r}
+outliers <- (abs(regression$residuals) > 0.4)
+ggplot(regression) + geom_point(aes(regression$fitted.values, regression$residuals, color=outliers))
+
+
+map_plot + geom_point(data=filter(M, outliers), aes(long, lat), color="red")
+```
+
+```{r}
+regression_no <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M %>% filter(!outliers))
+summary(regression_no)
+```
+
+```{r}
+regression_test <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view+yr_built, M %>% filter(!outliers))
+summary(regression_test)
+```
+
