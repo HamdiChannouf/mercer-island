@@ -18,10 +18,6 @@ L'objectif de ce projet est d'analyser l'ensemble de donnée avant de faire une 
 
 ## Variables du jeu de données
 
-Toto 
-id
-  ~ oueou 
-
 Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un logement est constitué d'une surface habitable et d'un terrain. À chacun de ces logements sont associés les 21 facteurs suivants: 
 
 * id:              Identifiant du logement (ignoré pour l'analyse) 
