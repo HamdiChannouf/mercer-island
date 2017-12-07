@@ -8,6 +8,6 @@
 * rapport: Rapport rédigé avec Knit
 * algorithmes: Implémentation avec Python des trois algorithmes vues en cours
   (via les exemples du livre de J. Pagès)
-	* [./algorithmes/AFC/analyse_correspondance.html](ACP):
+	* [ACP](./algorithmes/AFC/analyse_correspondance.html):
 	* AFC:
 	* ACM
