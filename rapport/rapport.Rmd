@@ -18,22 +18,22 @@ L'objectif de ce projet est d'analyser l'ensemble de donnée avant de faire une 
 
 ## Variables du jeu de données
 
-Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un logement est constitué d'une surface habitable et d'un terrain. À chacun de ces logements sont associés les 21 facteurs suivants: 
+Les données correspondent aux logements vendus entre mai 2014 et mai 2015. Un logement est constitué d'une surface habitable et d'un terrain. À chacun de ces logements sont associés les 21 variables suivantes: 
 
 * id:              Identifiant du logement (ignoré pour l'analyse) 
 * date:            Date de vente du logement [Date]
 * price:           Prix de vente [Continu]
 * bedrooms:        Nombre de chambres [Discret]
 * bathrooms:       Ratio entre le nombre de salle de bain et de chambre
-* sqft-living:     Surface du logement [Continu]
+* sqft-living:     Surface du logement (somme du sous-sol et étages supérieurs) [Continu]
+* sqft-above:      Surface du logement située au dessus du sol [Continu]
+* sqft-basement:   Surface du logement au niveau du sous-sol [Continu]
 * sqft-lot:        Surface du terrain [Continu]
 * floors:          Nombre d'étages dans la maison [Discret]
 * waterfront:      Vue sur les quais [Binaire]
 * view:            Nombre de fois le logement a été visité [Discret]
 * condition:       Appréciation de l'état du logement [Factoriel]
 * grade:           Évaluation de la qualité de construction du logement [Factoriel]
-* sqft-above:      Surface du logement située sur les étages supérieurs [Continu]
-* sqft-basement:   Surface du logement au niveau du sous-sol [Continu]
 * yr-built:        Année de construction [Date]
 * yr-renovated:    Année de rénovation [Date]
 * zipcode:         Zipcode 
@@ -109,43 +109,85 @@ pts <- SpatialPointsDataFrame(select(M, long, lat),
                               proj4string=CRS(proj4string(map_mercer)))
 ```
 
+### Répartition géographique
+
 ```{r}
 map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon()
+```
 
+#### Surface habitable déclarée  en 2015 et antérieurement à 2015
+
+```{r}
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=3)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=3)
+```
 
+#### Surface du terrain déclarée  en 2015 et antérieurement à 2015
+
+```{r}
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=3)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=3)
+```
 
+#### Surface au dessus du sol
+```{r}
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
+```
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
+#### Surface du sous-sol
 
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=3)
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
-
-map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
-
+```{r}
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqrt(sqft_basement)), shape=23, size=3) + scale_shape_identity()
 ```
+
+#### Nombre d'étages
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
+```
+
+#### Nombre de chambres à coucher
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=3)
+```
+
+#### Ratio Salle de Bain/Chambre à coucher
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=3)
+```
+
+#### Grade et Condition
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
+```
+
+#### Année de Construction et de rénovation
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=3)
+```
+
+#### Vue sur les quais
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
+```
+
+#### Prix (en échelle log)
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=3)
+```
+
+#### Date vente 
+```{r}
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
+```
+
 
 ```{r affiche-lorentz}
 affiche_lorentz <- function(v)
@@ -209,7 +251,6 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 ```
 
 ```{r}
-
 M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
 M %>% ggplot() + geom_histogram(aes((sqft_living - sqft_living15)/sqft_living))
 M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living))
