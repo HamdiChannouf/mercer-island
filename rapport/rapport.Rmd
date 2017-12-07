@@ -3,11 +3,11 @@ title: Analyse de Données
 subtitle: Étude immobilière de l'île Mercer (Washington, USA)
 author: Louie l'orang-outan
 output:
-  prettydoc::html_pretty:
-    theme: hpstr
-    highlight: github
-    self_contained: true
-    toc: true
+   rmdformats::readthedown:
+      highlight: kate
+      self_contained: true
+      df_print: kable
+      toc_depth: 5
 ---
 
 ## Introduction
@@ -188,7 +188,7 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price))
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
 ```
 
-
+### Inégalités 
 ```{r affiche-lorentz}
 affiche_lorentz <- function(v)
 {
@@ -205,7 +205,7 @@ affiche_lorentz <- function(v)
         annotate("text", x=0.25, y=0.775, label=paste("italic(G) ==", round(sqft_living_G, 2)), parse=TRUE, size=10)
 }
 ```
-
+#### Valeur
 ```{r}
 ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
 
@@ -213,31 +213,38 @@ ggplot(M, aes(log10(price))) + geom_histogram(bins=30)
 affiche_lorentz(M$price)
 ```
 
+#### Surface habitée
+
+##### Antérieurement à 2015
 ```{r}
 ggplot(M, aes(sqrt(sqft_living))) + geom_histogram(bins=30)
 
 affiche_lorentz(M$sqft_living)
 ```
 
+##### En 2015
 ```{r}
 ggplot(M, aes(sqrt(sqft_living15))) + geom_histogram(bins=30)
 
 affiche_lorentz(M$sqft_living15)
 ```
 
+#### Surface terrain
+##### Antérieurement à 2015
 ```{r}
 ggplot(M, aes(sqrt(sqft_lot))) + geom_histogram(bins=30)
 
 affiche_lorentz(M$sqft_lot)
 ```
 
+##### En 2015
 ```{r}
 ggplot(M, aes(sqrt(sqft_lot15))) + geom_histogram(bins=30)
 
 affiche_lorentz(M$sqft_lot15)
 ```
 
-
+### Corrélation linéaire
 ```{r}
 corrplot(cor(M %>% select(-c(view, condition, grade, 
                           lat, long, 
