@@ -124,6 +124,10 @@ map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
 
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=3)
+
+map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=3)
+
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
 
 map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
@@ -210,6 +214,14 @@ M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
 M %>% ggplot() + geom_histogram(aes((sqft_living - sqft_living15)/sqft_living))
 M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living))
 
+M %>% ggplot() + geom_point(aes(sqft_lot15, sqft_living15))
+M %>% ggplot() + geom_point(aes(sqft_lot, sqft_living))
+
+M %>% ggplot() + geom_histogram(aes((sqft_lot - sqft_lot15)/sqft_lot))
+M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot))
+M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living , (sqft_lot15 - sqft_lot)/sqft_lot))
+
+
 M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
 M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
 
@@ -237,6 +249,7 @@ M %>% ggplot() + geom_boxplot(aes(condition, price))
 M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
 M %>% ggplot()+ geom_point(aes(yr_built, log10(price)))
 M %>% ggplot()+ geom_point(aes(yr_renovated, log10(price)))
+M %>% ggplot()+ geom_point(aes(yr_built, yr_renovated))
 ```
 
 ```{r}
