@@ -121,6 +121,7 @@ library(rgdal)
 library(corrplot)
 library(ineq)
 library(bsselectR)
+library(viridis)
 ```
 
 ```{r}
@@ -152,71 +153,80 @@ pts <- SpatialPointsDataFrame(select(M, long, lat),
 ```
 
 ```{r}
-map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon() + theme(legend.position = "bottom", legend.key.width = unit(1, "cm")) + coord_fixed()
+map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon(fill="grey50") + theme(legend.position = "bottom", legend.key.width = unit(1, "cm")) +  coord_fixed()
 
 ```
 
 ```{r}
-map_elements <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat),shape=23, size=2, alpha=0.4, fill="skyblue")
+map_elements <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat),shape=23, size=2, alpha=0.5, fill="skyblue")
 ```
 
 ```{r}
-map_sqft_living15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=2)
+map_sqft_living15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 
 
-map_sqft_living <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=2)
+map_sqft_living <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_sqft_lot15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=2)
+map_sqft_lot15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 
-map_sqft_lot <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=2)
+map_sqft_lot <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=2)
+map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=2) + scale_fill_manual(values=c("grey30", "skyblue"))
+map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=2, alpha=0.5) +
+    scale_fill_manual(values=c("grey30", "skyblue"))
 
-map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=2) + scale_shape_identity()
+map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=2, alpha=0.5) +
+    scale_shape_identity() +
+    scale_fill_viridis()
 ```
 
 ```{r}
-map_floors <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=2)
+map_floors <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_bedrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=2)
+map_bedrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_bathrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=2)
+map_bathrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_grade <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=2)
+map_grade <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=2, alpha=0.5) + scale_color_brewer(palette = "Set1")
 
-map_condition <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=2)
+map_condition <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=2, alpha=0.5) + scale_color_brewer(palette = "Set1")
 ```
 
 ```{r}
-map_yr_built <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=2)
+map_yr_built <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=as.integer(yr_built)) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis(name = "Date", labels=function(x) { format(as.Date(x, origin='1970-01-01'), "%Y")})
 
-map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=2)
+map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=as.integer(yr_renovated)) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Date", labels=function(x) { format(as.Date(x, origin='1970-01-01'), "%Y")})
+
 ```
 
 ```{r}
-map_waterfront <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=2) + scale_fill_manual(values=c("grey30", "skyblue"))
+map_waterfront <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_manual(values=c("grey30", "skyblue"))
 ```
 
 ```{r}
-map_logprice <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=2)
+map_logprice <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis()
 ```
 
 ```{r}
-map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=2) + scale_shape_identity() + theme(legend.text=element_text(size=8))
+map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=as.integer(date)), shape=23, size=2, alpha=0.5) +
+    scale_shape_identity() +
+    scale_fill_viridis(name = "Date", labels=function(x) { format(as.Date(x, origin='1970-01-01'), "%B")}) +
+    theme(legend.text=element_text(size=8))
 
 ```
 
