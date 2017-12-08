@@ -152,12 +152,13 @@ pts <- SpatialPointsDataFrame(select(M, long, lat),
 ```
 
 ```{r}
-map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon()
+map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon() + theme(legend.position = "bottom", legend.key.width = unit(1, "cm")) + coord_fixed()
 
 ```
 
 ```{r}
 map_sqft_living15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=3)
+
 
 map_sqft_living <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=3)
 ```
@@ -175,7 +176,7 @@ map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, 
 ```{r}
 map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
 
-map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqrt(sqft_basement)), shape=23, size=3) + scale_shape_identity()
+map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=3) + scale_shape_identity()
 ```
 
 ```{r}
@@ -211,7 +212,8 @@ map_logprice <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fi
 ```
 
 ```{r}
-map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity()
+map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity() + theme(legend.text=element_text(size=8))
+
 ```
 
 ```{r}
@@ -313,7 +315,7 @@ plot_grid(
 #### Antérieurement à 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes(sqrt(sqft_living))) + geom_histogram(bins=30),
+    ggplot(M, aes((sqft_living)^0.5)) + geom_histogram(bins=30),
     affiche_lorentz(M$sqft_living)
     )
 ```
@@ -321,7 +323,7 @@ plot_grid(
 #### En 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes(sqrt(sqft_living15))) + geom_histogram(bins=30),
+    ggplot(M, aes((sqft_living15)^0.5)) + geom_histogram(bins=30),
     affiche_lorentz(M$sqft_living15)
 )
 ```
@@ -330,7 +332,7 @@ plot_grid(
 #### Antérieurement à 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes(sqrt(sqft_lot))) + geom_histogram(bins=30),
+    ggplot(M, aes((sqft_lot)^0.5)) + geom_histogram(bins=30),
     affiche_lorentz(M$sqft_lot)
 )
 ```
@@ -338,7 +340,7 @@ plot_grid(
 #### En 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes(sqrt(sqft_lot15))) + geom_histogram(bins=30),
+    ggplot(M, aes((sqft_lot15)^0.5)) + geom_histogram(bins=30),
     affiche_lorentz(M$sqft_lot15)
 )
 ```
