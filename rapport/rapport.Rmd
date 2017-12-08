@@ -363,7 +363,12 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 ```{r}
 #M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
 M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living))
-M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living))
+
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
+)
+
 ```
 
 ### Surface du terrain
@@ -373,12 +378,26 @@ M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft
 # M %>% ggplot() + geom_point(aes(sqft_lot, sqft_living))
 
 M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot)/sqft_lot))
-M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot))
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
+)
 ```
 
 ### Lien entre aménagement de la surface intérieure et extérieure
 ```{r}
-M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living ,(sqft_lot15 - sqft_lot)/sqft_lot)) + geom_abline(slope = 1, color="red") + coord_fixed()
+plot_grid(
+    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living ,(sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + geom_abline(slope = 1, color="red") + coord_fixed() + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living),(sqft_lot15 - sqft_lot)/10), alpha=0.5) + geom_abline(slope = 1, color="red") + ggtitle("Relatif")
+)
+```
+
+### Lien entre aménagement de la surface intérieure et surface initiale du terrain
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
+)
 ```
 
 ## Impact des caractéristiques du logement sur le prix
@@ -393,7 +412,7 @@ M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
 M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
 ```
 
-### Sufrace du terrain
+### Surface du terrain
 #### En 2015
 ```{r}
 M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price)))
@@ -445,15 +464,76 @@ M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
 
 ### Réaménagements
 #### Surface habitable
-##### Absolu
 ```{r}
-M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living, log10(price)))
+price_ream_living_w_legend<- M %>% ggplot() + geom_point(aes(sqft_living, log10(price),
+                                                     color=cut((sqft_living15 - sqft_living)/sqft_living,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     alpha = 0.5) +
+    scale_color_brewer(palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+price_ream_living <- price_ream_living_w_legend+ theme(legend.position="none")
+
+price_ream_living15 <-     M %>% ggplot() + geom_point(aes(sqft_living15, log10(price),
+                                    color=cut((sqft_living15 - sqft_living)/sqft_living,
+                                              breaks=c(-Inf,
+                                                       -1,
+                                                       -0.5,
+                                                       -0.1,
+                                                       0.1,
+                                                       0.5,
+                                                       1,
+                                                       Inf)
+                                              )),
+                                    alpha = 0.5) +
+    scale_color_brewer(palette = "Set1") + theme(legend.position="none")
+
+plot_grid(price_ream_living, price_ream_living15,get_legend(price_ream_living_w_legend), nrow=1, hjust = -1, rel_widths = c(2, 2, .5))
 ```
 
-##### Relatif
+#### Surface du terrain
 ```{r}
-M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living), log10(price)))
+price_ream_lot_w_legend <- M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot, log10(price),
+                                                     color=cut((sqft_lot15 - sqft_lot)/sqft_lot,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     alpha = 0.5) +
+    scale_color_brewer(palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu", title.hjust = 0.3)) 
+
+price_ream_lot <- price_ream_lot_w_legend+ theme(legend.position="none")
+
+price_ream_lot15 <- M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price),
+                                    color=cut((sqft_lot15 - sqft_lot)/sqft_lot,
+                                              breaks=c(-Inf,
+                                                       -1,
+                                                       -0.5,
+                                                       -0.1,
+                                                       0.1,
+                                                       0.5,
+                                                       1,
+                                                       Inf)
+                                              )),
+                                    alpha = 0.5) +
+    scale_color_brewer(palette = "Set1") + theme(legend.position="none")
+
+plot_grid(price_ream_lot, price_ream_lot15,get_legend(price_ream_lot_w_legend), nrow=1, hjust = -1, rel_widths = c(2, 2, .5))
 ```
+
+Une valeur anormalement grande a été retiré du premier graphe en raison d'une valeur de $sqft_lot$ très éloigné du nuage (supérieur à 75000).
 
 
 ## Autres
