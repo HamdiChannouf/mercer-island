@@ -533,7 +533,7 @@ price_ream_lot15 <- M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price),
 plot_grid(price_ream_lot, price_ream_lot15,get_legend(price_ream_lot_w_legend), nrow=1, hjust = -1, rel_widths = c(2, 2, .5))
 ```
 
-Une valeur anormalement grande a été retiré du premier graphe en raison d'une valeur de $sqft_lot$ très éloigné du nuage (supérieur à 75000).
+Une valeur anormalement grande a été retiré du premier graphe en raison d'une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 
 ## Autres
