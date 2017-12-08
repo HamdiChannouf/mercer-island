@@ -10,6 +10,26 @@ output:
       toc_depth: 5
 ---
 
+```{r, echo=FALSE}
+library(knitr)
+library(kableExtra)
+options(knitr.table.format = "html")
+opts_chunk$set(warning=FALSE,
+               echo=FALSE,
+               message=FALSE,
+               fig.align="center")
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(rgdal)
+library(corrplot)
+library(ineq)
+library(bsselectR)
+library(viridis)
+```
+
 ## Introduction
 
 Nous allons étudier un jeu de données immobilières. Il s'agit des ventes de logements à King County, compté contenant la ville de Seattle aux États-Unis. Ce jeu de donnée a été utilisé par un cours Coursera, il semblait tout à fait convenir à une introduction à diverses techniques de l'analyse et traitement de données, sachant l'extreme diversité des méthodes à utiliser, même pour des données modestes. Parmi les avantages de cet ensemble de données, déjà mise en forme, pas d'imputation de données nécessaires, peu de facteurs, une application possible d'une régression linéaire sans être obligé d'utiliser des modèles complexes.
@@ -102,27 +122,29 @@ Petite précision sur le facteur grade. Ce facteur est directement issu de l'adm
 L'île Mercer fait partie des 100  unités territoriales les plus riches de l'état de Washington. Elle est reliée à la terre qui l'entoure par une voie routière la traversant. On peut l'étudier comme un microsome étant donné le lac qui la sépare de la terre. Comparé à Vashon Island qui ne possède pas de liason terrestre, elle est dynamique et urbanisée.Au sein du jeu de données complet, on peut noter de très grandes disparités territoriales qui ont un impact direct sur le type d'habitation et leurs valeurs. En choisissant un ensemble géographiquement homogène et bien plus petit, on espère pouvoir avoir des conclusions plus précises et faciles à découvrir. 
 Cela doit être vu comme une première étape à l'analyse du jeu de données complet, que l'on ne peut pas mener à cause de contraintes temporelles et manque d'expérience.
 
+## Sommaire
+### Variables continues
+```{r}
+
+sommaire <- sapply(select(M, -c(id, grade, condition, zipcode, waterfront, date, yr_built, yr_renovated, bedrooms, view)), summary)
+
+rownames(sommaire) <- c("Minimum",
+                        "1er Quartile",
+                        "Médiane",
+                        "Moyenne",
+                        "3e Quartile",
+                        "Maximum")
+
+
+t(sommaire) %>% kable %>%
+    kable_styling(position = "center",
+                  font_size=12)
+
+```
+
 ## Répartition géographique
 
-```{r, echo=FALSE}
-library(knitr)
-library(kableExtra)
-options(knitr.table.format = "html")
-opts_chunk$set(warning=FALSE,
-               echo=FALSE,
-               message=FALSE,
-               fig.align="center")
-```
 
-```{r}
-library(tidyverse)
-library(cowplot)
-library(rgdal)
-library(corrplot)
-library(ineq)
-library(bsselectR)
-library(viridis)
-```
 
 ```{r}
 D <- read.csv("../donnees/kc_house_data.csv")
