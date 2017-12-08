@@ -378,38 +378,98 @@ M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot))
 
 ### Lien entre aménagement de la surface intérieure et extérieure
 ```{r}
-M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living , (sqft_lot15 - sqft_lot)/sqft_lot))
+M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living ,(sqft_lot15 - sqft_lot)/sqft_lot)) + geom_abline(slope = 1, color="red") + coord_fixed()
 ```
 
-## Autres
+## Impact des caractéristiques du logement sur le prix
+### Surface habitable
+#### En 2015
 ```{r}
 M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
-M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
+```
 
+#### Avant 2015
+```{r}
+M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
+```
+
+### Sufrace du terrain
+#### En 2015
+```{r}
 M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price)))
+```
+
+#### Avant 2015
+```{r}
 M %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
 ```
 
+### Utilitaires
+#### Salles de bain
+```{r}
+M %>% ggplot() + geom_point(aes(bathrooms, log10(price)))
+```
+
+#### Salles à coucher
+```{r}
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
+```
+
+### Audit
+#### Grade
+```{r}
+M %>% ggplot() + geom_boxplot(aes(grade, price))
+```
+
+#### Condition
+```{r}
+M %>% ggplot() + geom_boxplot(aes(condition, price))
+
+```
+
+### Temps
+#### Année de construction
+```{r}
+M %>% ggplot()+ geom_point(aes(yr_built, log10(price)))
+```
+
+#### Année de rénovation
+```{r}
+M %>% ggplot()+ geom_point(aes(yr_renovated, log10(price)))
+```
+
+#### Date de vente
+```{r}
+M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
+```
+
+### Réaménagements
+#### Surface habitable
+##### Absolu
+```{r}
+M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living, log10(price)))
+```
+##### Relative
+```{r}
+M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living), log10(price)))
+```
+
+
+## Autres
 ```{r}
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
 M %>% ggplot() + geom_point(aes(sqft_living, bathrooms))
-M %>% ggplot() + geom_point(aes(bathrooms, log10(price)))
 
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living15))
 M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living))
-M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), price))
 
 M %>% ggplot() + geom_boxplot(aes(grade, sqft_living15))
 M %>% ggplot() + geom_boxplot(aes(grade, sqft_living))
-M %>% ggplot() + geom_boxplot(aes(grade, price))
 
 M %>% ggplot() + geom_boxplot(aes(condition, sqft_living15))
 M %>% ggplot() + geom_boxplot(aes(condition, sqft_living))
-M %>% ggplot() + geom_boxplot(aes(condition, price))
 
-M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
-M %>% ggplot()+ geom_point(aes(yr_built, log10(price)))
-M %>% ggplot()+ geom_point(aes(yr_renovated, log10(price)))
+
 M %>% ggplot()+ geom_point(aes(yr_built, yr_renovated))
 ```
 
