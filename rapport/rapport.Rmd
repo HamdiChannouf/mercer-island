@@ -157,85 +157,91 @@ map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon() + theme(lege
 ```
 
 ```{r}
-map_sqft_living15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=3)
-
-
-map_sqft_living <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=3)
+map_elements <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat),shape=23, size=2, alpha=0.4, fill="skyblue")
 ```
 
 ```{r}
-map_sqft_lot15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=3)
+map_sqft_living15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living15)^0.5) ,shape=23, size=2)
 
-map_sqft_lot <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=3)
+
+map_sqft_living <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_living)^0.5) ,shape=23, size=2)
 ```
 
 ```{r}
-map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=3)
+map_sqft_lot15 <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot15)^0.5) ,shape=23, size=2)
+
+map_sqft_lot <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_lot)^0.5), shape=23, size=2)
 ```
 
 ```{r}
-map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
-
-map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=3) + scale_shape_identity()
+map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_above)^0.5) ,shape=23, size=2)
 ```
 
 ```{r}
-map_floors <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=3)
+map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=2) + scale_fill_manual(values=c("grey30", "skyblue"))
+
+map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=2) + scale_shape_identity()
 ```
 
 ```{r}
-map_bedrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=3)
+map_floors <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=floors) ,shape=23, size=2)
 ```
 
 ```{r}
-map_bathrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=3)
+map_bedrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bedrooms) ,shape=23, size=2)
 ```
 
 ```{r}
-map_grade <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=3)
-
-map_condition <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=3)
+map_bathrooms <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=bathrooms) ,shape=23, size=2)
 ```
 
 ```{r}
-map_yr_built <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=3)
+map_grade <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=grade) ,shape=23, size=2)
 
-map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=3)
+map_condition <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=condition) ,shape=23, size=2)
 ```
 
 ```{r}
-map_waterfront <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=3) + scale_fill_manual(values=c("grey30", "skyblue"))
+map_yr_built <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_built) ,shape=23, size=2)
+
+map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=yr_renovated) ,shape=23, size=2)
 ```
 
 ```{r}
-map_logprice <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=3)
+map_waterfront <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=2) + scale_fill_manual(values=c("grey30", "skyblue"))
 ```
 
 ```{r}
-map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=3) + scale_shape_identity() + theme(legend.text=element_text(size=8))
+map_logprice <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=log10(price)) ,shape=23, size=2)
+```
+
+```{r}
+map_date <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=date), shape=23, size=2) + scale_shape_identity() + theme(legend.text=element_text(size=8))
 
 ```
 
 ```{r}
-menu_map <- list(map_sqft_living15,
-              map_sqft_living,
-              map_sqft_lot15,
-              map_sqft_lot,
-              map_sqft_above,
-              map_sqft_basement_not_null,
-              map_sqft_basement,
-              map_floors,
-              map_bedrooms,
-              map_bathrooms,
-              map_grade,
-              map_condition,
-              map_yr_built,
-              map_yr_renovated,
-              map_waterfront,
-              map_logprice,
-              map_date)
+menu_map <- list(map_elements,
+                 map_sqft_living15,
+                 map_sqft_living,
+                 map_sqft_lot15,
+                 map_sqft_lot,
+                 map_sqft_above,
+                 map_sqft_basement_not_null,
+                 map_sqft_basement,
+                 map_floors,
+                 map_bedrooms,
+                 map_bathrooms,
+                 map_grade,
+                 map_condition,
+                 map_yr_built,
+                 map_yr_renovated,
+                 map_waterfront,
+                 map_logprice,
+                 map_date)
 
-menu_map_filename <- c("map_sqft_living15",
+menu_map_filename <- c("map_elements",
+                       "map_sqft_living15",
                        "map_sqft_living",
                        "map_sqft_lot15",
                        "map_sqft_lot",
@@ -255,9 +261,10 @@ menu_map_filename <- c("map_sqft_living15",
 
 menu_map_filename <- paste0(menu_map_filename, ".png")
 
-pwalk(list(menu_map_filename, menu_map), ggsave, path = "plots", dpi = 300)
+pwalk(list(menu_map_filename, menu_map), ggsave, path = "plots", dpi = 300, height = 6)
 
-menu_map_name <- c("Surface habitable en 2015",
+menu_map_name <- c("Logements",
+                   "Surface habitable en 2015",
                    "Surface habitable",
                    "Surface du terrain en 2015",
                    "Surface du terrain",
