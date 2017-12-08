@@ -94,7 +94,7 @@ Petite précision sur le facteur grade. Ce facteur est directement issu de l'adm
 * [9] Meilleure architecture, de bonnes conception et qualité d'éxécution.
 * [10] Les habitations de ce type sont celles de qualité supérieure, meilleur finition, plus spacieuse et un meilleur agencement des pièces
 * [11] Conception personnalisée et finitions de qualité supérieure, avec ajout de mobilier en bois massif, de mobiliers fixatif dans les salles de bains et agréments de luxe.
-* [12] Conception personnalisée et excellent éxécutants. Tous les matériaux sont de qualités supérieurs, et toutes les commodités sont présentes
+* [12] Conception personnalisée et excellents éxécutants. Tous les matériaux sont de qualités supérieurs, et toutes les commodités sont présentes
 * [13] Généralement, conception et construction personalisées. Proche du niveau du manoir. Important travail pour les cuisines. Grande quantité de plancher en bois et de marbre. Grandes entrées.
 
 ### Restriction à Mercer Island
@@ -158,7 +158,7 @@ map_plot <- ggplot(map_mercer, aes(x=long, y=lat)) + geom_polygon(fill="grey50")
 ```
 
 ```{r}
-map_elements <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat),shape=23, size=2, alpha=0.5, fill="skyblue")
+map_elements <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat),shape=23, size=2, alpha=0.5, fill="red")
 ```
 
 ```{r}
@@ -180,7 +180,7 @@ map_sqft_above <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, 
 
 ```{r}
 map_sqft_basement_not_null <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=sqft_basement>0), shape=23, size=2, alpha=0.5) +
-    scale_fill_manual(values=c("grey30", "skyblue"))
+    scale_fill_manual(values=c("grey30", "red"))
 
 map_sqft_basement <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement)^0.5), shape=23, size=2, alpha=0.5) +
     scale_shape_identity() +
@@ -215,7 +215,7 @@ map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat
 
 ```{r}
 map_waterfront <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=waterfront) ,shape=23, size=2, alpha=0.5) +
-    scale_fill_manual(values=c("grey30", "skyblue"))
+    scale_fill_manual(values=c("grey30", "red"))
 ```
 
 ```{r}
