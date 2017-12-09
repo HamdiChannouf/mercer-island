@@ -533,6 +533,55 @@ plot_grid(
 )
 ```
 
+### Géographiquement
+#### Surface habitable
+```{r}
+a_abs <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_living15 - sqft_living)/sqft_living,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_living15 - sqft_living)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs, a_rel)
+```
+
+#### Surface du terrain
+```{r}
+a_abs_lot <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_lot15 - sqft_lot)/sqft_lot,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel_lot<- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_lot15 - sqft_lot)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs_lot, a_rel_lot)
+```
+
 ## Impact des caractéristiques du logement sur le prix
 ### Surface habitable
 #### En 2015
