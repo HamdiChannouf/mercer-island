@@ -501,7 +501,7 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 #M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
 plot_grid(
     M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living))+ ggtitle("Absolu"),
-    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living)) + ggtitle("Relatif")
+    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living))) + ggtitle("Relatif")
 )
 
 a_abs <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
