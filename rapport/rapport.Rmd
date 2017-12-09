@@ -575,7 +575,7 @@ plot_grid(
 ```{r}
 plot_grid(
     M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living ,(sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + geom_abline(slope = 1, color="red") + coord_fixed() + ggtitle("Absolu"),
-    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living),(sqft_lot15 - sqft_lot)/10), alpha=0.5) + geom_abline(slope = 1, color="red") + ggtitle("Relatif")
+    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living),(sqft_lot15 - sqft_lot)), alpha=0.5) + geom_abline(slope = 1, color="red") + coord_fixed(0.1) + ggtitle("Relatif")
 )
 ```
 
@@ -826,7 +826,7 @@ ggplot(pca_ind) +
     coord_fixed()
 ```
 
-## Autres
+## Logements au prix anormalement élevés
 ```{r}
 regression <- (lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M))
 summary(regression)
@@ -849,5 +849,10 @@ summary(regression_no)
 regression_test <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view+yr_built, M %>% filter(!outliers))
 summary(regression_test)
 ```
+
+
+
+## Autres
+
 
 
