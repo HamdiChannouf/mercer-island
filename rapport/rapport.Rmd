@@ -29,6 +29,8 @@ library(ineq)
 library(bsselectR)
 library(viridis)
 library(reshape2)
+library(FactoMineR)
+library(ggforce)
 ```
 
 ```{r}
@@ -502,6 +504,27 @@ plot_grid(
     M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living)) + ggtitle("Relatif")
 )
 
+a_abs <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_living15 - sqft_living)/sqft_living,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_living15 - sqft_living)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs, a_rel)
+
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
     M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
@@ -519,6 +542,28 @@ plot_grid(
     M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot)/sqft_lot))+ ggtitle("Absolu"),
     M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot))) + ggtitle("Relatif")
 )
+
+
+a_abs_lot <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_lot15 - sqft_lot)/sqft_lot,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel_lot<- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_lot15 - sqft_lot)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs_lot, a_rel_lot)
 
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
@@ -545,59 +590,21 @@ plot_grid(
 ### Harmonisation de la surface intérieure et la surface extérieure
 
 ```{r}
+InertieM <- (M %>% select(sqft_living, sqft_lot) %>% cov)*(nrow(M)-1)
+Inertie15M <- (M %>% select(sqft_living15, sqft_lot15) %>% cov)*(nrow(M)-1)
+
+Inertie_table <- rbind(diag(InertieM), diag(Inertie15M))
+rownames(Inertie_table) <- c("Avant 2015", "2015")
+
+Inertie_table <- formatC(Inertie_table, format="e", digits=2)
+
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_living, sqft_lot)),
     M %>% ggplot() + geom_point(aes(sqft_living15, sqft_lot15))
 )
-```
 
-### Géographiquement
-#### Surface habitable
-```{r}
-a_abs <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
-                                                     fill=cut((sqft_living15 - sqft_living)/sqft_living,
-                                                               breaks=c(-Inf,
-                                                                        -1,
-                                                                        -0.5,
-                                                                        -0.1,
-                                                                        0.1,
-                                                                        0.5,
-                                                                        1,
-                                                                        Inf)
-                                                               )),
-                                                     shape=23, size=2, alpha=0.5) +
-    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
-
-a_rel <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
-                                                                fill=(sqft_living15 - sqft_living)),
-                                 shape=23, size=2, alpha=0.5) +
-    scale_fill_viridis(name = "Aménagement\nrelatif")
-
-plot_grid(a_abs, a_rel)
-```
-
-#### Surface du terrain
-```{r}
-a_abs_lot <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
-                                                     fill=cut((sqft_lot15 - sqft_lot)/sqft_lot,
-                                                               breaks=c(-Inf,
-                                                                        -1,
-                                                                        -0.5,
-                                                                        -0.1,
-                                                                        0.1,
-                                                                        0.5,
-                                                                        1,
-                                                                        Inf)
-                                                               )),
-                                                     shape=23, size=2, alpha=0.5) +
-    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
-
-a_rel_lot<- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
-                                                                fill=(sqft_lot15 - sqft_lot)),
-                                 shape=23, size=2, alpha=0.5) +
-    scale_fill_viridis(name = "Aménagement\nrelatif")
-
-plot_grid(a_abs_lot, a_rel_lot)
+Inertie_table %>% kable(caption = "Variation inertie par axe") %>%
+    kable_styling("striped", full_width = F)
 ```
 
 ## Impact des caractéristiques du logement sur le prix
@@ -729,38 +736,97 @@ plot_grid(price_ream_lot, price_ream_lot15,get_legend(price_ream_lot_w_legend), 
 
 Une valeur anormalement grande a été retiré du premier graphe en raison d'une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
-
-## Autres
+## Liens entre taille du logement et caractéristiques
+### Surface habitée
+#### Chambre à coucher
 ```{r}
-M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
-
-
 plot_grid(
     M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living15)),
     M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living))
 )
+```
 
+#### Grade
+```{r}
 plot_grid(
     M %>% ggplot() + geom_boxplot(aes(grade, sqft_living15)),
     M %>% ggplot() + geom_boxplot(aes(grade, sqft_living))
 )
+```
 
-
-
-plot_grid(
-    M %>% ggplot() + geom_boxplot(aes(grade, sqft_lot15)),
-    M %>% ggplot() + geom_boxplot(aes(grade, sqft_lot))
-)
-
+#### Condition
+```{r}
 plot_grid(
     M %>% ggplot() + geom_boxplot(aes(condition, sqft_living15)),
     M %>% ggplot() + geom_boxplot(aes(condition, sqft_living))
 )
+```
 
+### Surface du terrain
+#### Chambes à coucher
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living15)),
+    M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), sqft_living))
+)
+```
 
+#### Grade
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_boxplot(aes(grade, sqft_lot15)),
+    M %>% ggplot() + geom_boxplot(aes(grade, sqft_lot))
+)
+```
+
+#### Condition
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_boxplot(aes(condition, sqft_lot15)),
+    M %>% ggplot() + geom_boxplot(aes(condition, sqft_lot))
+)
+```
+
+## Lien entre année de rénovation et année de construction
+```{r}
 M %>% ggplot()+ geom_point(aes(yr_built, yr_renovated))
 ```
 
+## Autres corrélations
+### Chambres à coucher et salles de bain
+```{r}
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
+```
+
+## Analyse en Composantes Principales sur les variables continues
+```{r}
+pca <- PCA(plot_continuous)
+```
+
+### Projection des variables sur le plan d'inertie maximum
+```{r}
+pca_var<- data.frame(x=pca$var$coord[,1], y=pca$var$coord[,2])
+ggplot(pca_var)  +
+    geom_circle(aes(x0=0, y0=0, r=1)) +
+    geom_segment(aes(xend=x, yend=y), x=0, y=0,
+                                   arrow=arrow(angle = 15,
+                                               type = "closed"),
+                 color="grey50") +
+    xlab(paste("Dim 1: ", round(pca$eig[1, 2], 2), "%")) +
+    ylab(paste("Dim 2: ", round(pca$eig[2, 2], 2), "%")) +
+    geom_text(aes(x, y, label=rownames(toot)), vjust=0) +
+    coord_fixed()
+```
+
+### Projection des élements sur le plan d'inertie maximum
+```{r}
+pca_ind <- data.frame(x=pca$ind$coord[,1], y=pca$ind$coord[,2])
+ggplot(pca_ind) +
+    geom_point(aes(x,y)) +
+    coord_fixed()
+```
+
+## Autres
 ```{r}
 regression <- (lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M))
 summary(regression)
@@ -783,3 +849,5 @@ summary(regression_no)
 regression_test <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view+yr_built, M %>% filter(!outliers))
 summary(regression_test)
 ```
+
+
