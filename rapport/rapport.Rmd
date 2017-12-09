@@ -310,6 +310,9 @@ map_condition <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, f
 ```{r}
 map_yr_built <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=as.integer(yr_built)) ,shape=23, size=2, alpha=0.5) + scale_fill_viridis(name = "Date", labels=function(x) { format(as.Date(x, origin='1970-01-01'), "%Y")})
 
+map_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=!is.na(yr_renovated)) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_manual(name = "Renovated", values=c("grey30", "red"))
+
 map_yr_renovated <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat, fill=as.integer(yr_renovated)) ,shape=23, size=2, alpha=0.5) +
     scale_fill_viridis(name = "Date", labels=function(x) { format(as.Date(x, origin='1970-01-01'), "%Y")})
 
@@ -347,6 +350,7 @@ menu_map <- list(map_elements,
                  map_grade,
                  map_condition,
                  map_yr_built,
+                 map_renovated,
                  map_yr_renovated,
                  map_waterfront,
                  map_logprice,
@@ -366,6 +370,7 @@ menu_map_filename <- c("map_elements",
                        "map_grade",
                        "map_condition",
                        "map_yr_built",
+                       "map_renovated",
                        "map_yr_renovated",
                        "map_waterfront",
                        "map_logprice",
@@ -389,6 +394,7 @@ menu_map_name <- c("Logements",
                    "Grade",
                    "Condition",
                    "Année de construction",
+                   "Rénovation entreprise",
                    "Année de rénovation",
                    "Vue sur les quais",
                    "Prix en échelle log",
