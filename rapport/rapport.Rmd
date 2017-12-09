@@ -497,7 +497,10 @@ corrplot(cor(M %>% select(-c(view, condition, grade,
 ### Surface Habitable
 ```{r}
 #M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
-M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living))
+plot_grid(
+    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living))+ ggtitle("Absolu"),
+    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living)) + ggtitle("Relatif")
+)
 
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
@@ -512,7 +515,11 @@ plot_grid(
 # M %>% ggplot() + geom_point(aes(sqft_lot15, sqft_living15))
 # M %>% ggplot() + geom_point(aes(sqft_lot, sqft_living))
 
-M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot)/sqft_lot))
+plot_grid(
+    M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot)/sqft_lot))+ ggtitle("Absolu"),
+    M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot))) + ggtitle("Relatif")
+)
+
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
     M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
