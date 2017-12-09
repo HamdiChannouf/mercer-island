@@ -28,6 +28,7 @@ library(corrplot)
 library(ineq)
 library(bsselectR)
 library(viridis)
+library(reshape2)
 ```
 
 ```{r}
@@ -145,7 +146,7 @@ Cela doit être vu comme une première étape à l'analyse du jeu de données co
 ## Sommaire
 ### Variables continues
 ```{r}
-sommaire <- sapply(select(M, -c(id, grade, condition, zipcode, waterfront, date, yr_built, yr_renovated, bedrooms, view)), summary)
+sommaire <- sapply(select(M, -c(id, grade, condition, zipcode, waterfront, floors, date, yr_built, yr_renovated, bedrooms, view)), summary)
 
 rownames(sommaire) <- c("Minimum",
                         "1er Quartile",
@@ -160,6 +161,13 @@ t(sommaire) %>% kable %>%
 
 ```
 
+```{r}
+plot_continuous <-  M %>% select(-c(id, grade, condition, floors, zipcode, waterfront, date, yr_built, yr_renovated, bedrooms, view)) %>% mutate(log10_price = log10(price)) %>% select(-price)
+
+ggplot(data=melt(plot_continuous), mapping = aes(x = value)) + geom_histogram() + facet_wrap(~variable, scale = 'free_x') + theme(axis.text=element_text(size=7)) 
+
+```
+
 ### Variables factorielles ou discrètes
 ```{r}
 som_fod <- function(x) {
@@ -171,6 +179,10 @@ som_fod <- function(x) {
         kable_styling("striped", full_width = F) %>%
         row_spec(0,  bold = T)
 }
+```
+#### Étages
+```{r}
+som_fod(M$floors)
 ```
 
 #### bedrooms
@@ -200,6 +212,13 @@ som_fod(M$condition)
 #### waterfront
 ```{r}
 som_fod(M$waterfront)
+
+```
+
+```{r}
+plot_discrete <- M %>% select(c(grade, condition, floors, waterfront, bedrooms, view)) %>% mutate_at(.funs = as.factor, .vars = vars(floors, bedrooms, view))
+
+ggplot(data=melt(plot_discrete, id.var=NULL), mapping = aes(x = value)) + geom_bar() + facet_wrap(~variable, scale = 'free_x')
 
 ```
 
@@ -238,6 +257,14 @@ M$yr_renovated %>% summary %>% as.character %>% as.matrix %>%
     kable %>%
     kable_styling("striped", full_width = F)
 
+
+```
+
+
+```{r}
+plot_tmp <- M %>% select(c(date, yr_built, yr_renovated))
+
+ggplot(data=melt(plot_tmp), mapping = aes(x = value)) + geom_histogram() + facet_wrap(~variable, scale = 'free_x') + theme(axis.text=element_text(size=8)) 
 
 ```
 
@@ -771,4 +798,3 @@ summary(regression_no)
 regression_test <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view+yr_built, M %>% filter(!outliers))
 summary(regression_test)
 ```
-
