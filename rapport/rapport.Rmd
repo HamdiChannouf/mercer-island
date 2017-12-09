@@ -458,41 +458,25 @@ affiche_lorentz <- function(v)
 plot_grid(
     ggplot(M, aes(log10(price))) + geom_histogram(bins=30),
     affiche_lorentz(M$price)
-    )
+)
 ```
 
 ### Surface habitée
 
-#### Antérieurement à 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes((sqft_living)^0.5)) + geom_histogram(bins=30),
-    affiche_lorentz(M$sqft_living)
-    )
-```
-
-#### En 2015
-```{r}
-plot_grid(
-    ggplot(M, aes((sqft_living15)^0.5)) + geom_histogram(bins=30),
-    affiche_lorentz(M$sqft_living15)
+    affiche_lorentz(M$sqft_living) + draw_plot(ggplot(M) + geom_histogram(aes(sqft_living))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5),
+    affiche_lorentz(M$sqft_living15) + draw_plot(ggplot(M) + geom_histogram(aes(sqft_living15))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5)
 )
 ```
 
 ### Surface terrain
-#### Antérieurement à 2015
 ```{r}
 plot_grid(
-    ggplot(M, aes((sqft_lot)^0.5)) + geom_histogram(bins=30),
-    affiche_lorentz(M$sqft_lot)
-)
-```
-
-#### En 2015
-```{r}
-plot_grid(
-    ggplot(M, aes((sqft_lot15)^0.5)) + geom_histogram(bins=30),
-    affiche_lorentz(M$sqft_lot15)
+    affiche_lorentz(M$sqft_lot) + draw_plot(ggplot(M) +
+                                            geom_histogram(aes(sqft_lot))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5),
+    affiche_lorentz(M$sqft_lot15) + draw_plot(ggplot(M) +
+                                              geom_histogram(aes(sqft_lot15))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5)
 )
 ```
 
@@ -611,25 +595,19 @@ plot_grid(a_abs_lot, a_rel_lot)
 
 ## Impact des caractéristiques du logement sur le prix
 ### Surface habitable
-#### En 2015
 ```{r}
-M %>% ggplot() + geom_point(aes(sqft_living15, log10(price)))
-```
-
-#### Avant 2015
-```{r}
-M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_living15, log10(price))),
+    M %>% ggplot() + geom_point(aes(sqft_living, log10(price)))
+)
 ```
 
 ### Surface du terrain
-#### En 2015
 ```{r}
-M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price)))
-```
-
-#### Avant 2015
-```{r}
-M %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price))),
+    M %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
+)
 ```
 
 ### Utilitaires
