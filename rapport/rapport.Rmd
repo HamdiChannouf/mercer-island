@@ -467,18 +467,28 @@ plot_grid(
 
 ```{r}
 plot_grid(
-    affiche_lorentz(M$sqft_living) + draw_plot(ggplot(M) + geom_histogram(aes(sqft_living))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5),
-    affiche_lorentz(M$sqft_living15) + draw_plot(ggplot(M) + geom_histogram(aes(sqft_living15))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5)
+    affiche_lorentz(M$sqft_living) +
+    draw_plot(ggplot(M) +
+              geom_histogram(aes(sqft_living)) +
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5),
+    affiche_lorentz(M$sqft_living15) +
+    draw_plot(ggplot(M) +
+              geom_histogram(aes(sqft_living15)) +
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5)
 )
 ```
 
 ### Surface terrain
 ```{r}
 plot_grid(
-    affiche_lorentz(M$sqft_lot) + draw_plot(ggplot(M) +
-                                            geom_histogram(aes(sqft_lot))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5),
-    affiche_lorentz(M$sqft_lot15) + draw_plot(ggplot(M) +
-                                              geom_histogram(aes(sqft_lot15))+ theme(axis.text=element_text(size=10)), 0.5, 0, 0.5, 0.5)
+    affiche_lorentz(M$sqft_lot) +
+    draw_plot(ggplot(M) +
+              geom_histogram(aes(sqft_lot)) +
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5),
+    affiche_lorentz(M$sqft_lot15) +
+    draw_plot(ggplot(M) +
+              geom_histogram(aes(sqft_lot15)) +
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5)
 )
 ```
 
@@ -566,10 +576,11 @@ a_rel_lot<- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
 plot_grid(a_abs_lot, a_rel_lot)
 
 plot_grid(
-    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
-    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
 )
 ```
+Une valeur anormalement grande a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 ### Lien entre aménagement de la surface intérieure et extérieure
 ```{r}
@@ -582,10 +593,11 @@ plot_grid(
 ### Lien entre aménagement de la surface intérieure et surface initiale du terrain
 ```{r}
 plot_grid(
-    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
-    M %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
 )
 ```
+Une valeur anormalement grande a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 ### Harmonisation de la surface intérieure et la surface extérieure
 
@@ -607,6 +619,11 @@ Inertie_table %>% kable(caption = "Variation inertie par axe") %>%
     kable_styling("striped", full_width = F)
 ```
 
+### Grade et variation relative
+```{r}
+ggplot(M) + geom_point(aes(grade, (sqft_living15 - sqft_living)), alpha=0.1)
+```
+
 ## Impact des caractéristiques du logement sur le prix
 ### Surface habitable
 ```{r}
@@ -620,7 +637,17 @@ plot_grid(
 ```{r}
 plot_grid(
     M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price))),
-    M %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
+)
+```
+Une valeur anormalement grande a été retiré du second graphe en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+
+
+### Surface du sous-sol et supérieure
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_basement, log10(price))),
+    M %>% ggplot() + geom_point(aes(sqft_above, log10(price)))
 )
 ```
 
@@ -792,20 +819,16 @@ plot_grid(
 M %>% ggplot()+ geom_point(aes(yr_built, yr_renovated))
 ```
 
-## Autres corrélations
-### Chambres à coucher et salles de bain
-```{r}
-M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
-```
 
 ## Analyse en Composantes Principales sur les variables continues
 ```{r}
-pca <- PCA(plot_continuous)
+pca_variables<-  M %>% select(-c(id, grade, condition, zipcode, waterfront, date, yr_built, yr_renovated, lat, long)) %>% mutate(log10_price = log10(price)) %>% select(-price)
+pca <- PCA(pca_variables)
 ```
 
 ### Projection des variables sur le plan d'inertie maximum
 ```{r}
-pca_var<- data.frame(x=pca$var$coord[,1], y=pca$var$coord[,2])
+pca_var<- data.frame(x=pca$var$coord[,1], y=pca$var$coord[,2], names=names(pca$var$coord[,2]))
 ggplot(pca_var)  +
     geom_circle(aes(x0=0, y0=0, r=1)) +
     geom_segment(aes(xend=x, yend=y), x=0, y=0,
@@ -814,45 +837,117 @@ ggplot(pca_var)  +
                  color="grey50") +
     xlab(paste("Dim 1: ", round(pca$eig[1, 2], 2), "%")) +
     ylab(paste("Dim 2: ", round(pca$eig[2, 2], 2), "%")) +
-    geom_text(aes(x, y, label=rownames(toot)), vjust=0) +
+    geom_text(aes(x, y, label=names), vjust=0) +
     coord_fixed()
+```
+
+### Contribution des variables
+```{r}
+composantes <- names(pca$var$contrib[,1])
+
+contrib_df <- data.frame(variables = composantes,
+                  "Dim 1" = pca$var$contrib[,1],
+                  "Dim 2" = pca$var$contrib[,2])
+
+ggplot(melt(contrib_df),
+       aes(x = variables,
+           y = value,
+           fill = variable), xlab="Age Group") +
+    geom_bar(stat="identity", width=.5, position = "dodge") +
+    theme(axis.text=element_text(size=7)) + 
+    labs(fill = "Axes")
+
+## ggplot() +
+##     geom_bar(aes(x=variables, y=contribution), stat="identity") +
+##     theme(axis.text=element_text(size=7)) +
+##     ylim(0, 25) + 
+##     ggtitle("Dim 1")
+## ggplot(data.frame(variables = composantes,
+##                   contribution = pca$var$contrib[,2])) +
+##     geom_bar(aes(x=variables , y=contribution), stat="identity") +
+##     theme(axis.text=element_text(size=7)) +
+##     ylim(0, 25) + 
+##     ggtitle("Dim 2")
 ```
 
 ### Projection des élements sur le plan d'inertie maximum
 ```{r}
 pca_ind <- data.frame(x=pca$ind$coord[,1], y=pca$ind$coord[,2])
 ggplot(pca_ind) +
-    geom_point(aes(x,y)) +
+    geom_point(aes(x,y), alpha=0.5) +
     coord_fixed()
 ```
 
-## Logements au prix anormalement élevés
+## Logements au prix anormalement bas
+
+On procède à une régression linéaire sur le log décimale du prix suivant une sélection de variables 
+considérées significatives (statistiquement). On remarque des valeurs de prix très surrestimées.
+
 ```{r}
-regression <- (lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M))
-summary(regression)
+regression <- lm(log10(price)~
+                     sqft_living +
+#                     sqft_living15 +
+                     sqft_basement +
+                     bathrooms +
+                     waterfront +
+                     view +
+                     bathrooms +
+#                     condition +
+                     grade,
+                M)
+#summary(regression)
+
+regression$coefficients %>% as.matrix %>% t %>% kable %>%
+    kable_styling("striped", full_width = F)
 ```
 
 ```{r}
-outliers <- (abs(regression$residuals) > 0.4)
-ggplot(regression) + geom_point(aes(regression$fitted.values, regression$residuals, color=outliers))
+res_map <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat,
+                                             fill=cut(regression$residuals,
+                                                      breaks=c(-Inf,
+                                                               -0.2,
+                                                               -0.1,
+                                                               0.1,
+                                                               0.2,
+                                                               Inf))),
+                                 shape = 23, alpha = 0.5, size = 2) +
+    scale_fill_brewer(name = "Résidus", palette = "Set1")
 
-
-map_plot + geom_point(data=filter(M, outliers), aes(long, lat), color="red")
+plot_grid(
+plot_grid(
+    ggplot(regression) + geom_point(aes(regression$fitted.values,
+                                    regression$residuals,
+                                    color=cut(regression$residuals,
+                                              breaks=c(-Inf,
+                                                       -0.2,
+                                                       -0.1,
+                                                       0.1,
+                                                       0.2,
+                                                       Inf)))) +
+    theme(legend.position = "none"),
+    res_map + theme(legend.position = "none"),
+    align = "vh",
+    hjust = -1,
+    nrow = 1
+),
+get_legend(res_map),
+ncol = 1,
+rel_heights = c(1, .2)
+)
 ```
 
+## Autres remarques
+### Chambres à coucher et salles de bain
 ```{r}
-regression_no <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view, M %>% filter(!outliers))
-summary(regression_no)
+M %>% ggplot() + geom_boxplot(aes(factor(bedrooms), bathrooms))
 ```
 
+### Part du sous-sol dans la surface habitable
 ```{r}
-regression_test <- lm(log(price)~sqft_living+sqft_living15+sqft_basement+bathrooms+waterfront+view+yr_built, M %>% filter(!outliers))
-summary(regression_test)
+plot_grid(
+    ggplot(M) + geom_point(aes(sqft_living, sqft_basement), alpha=0.5),
+    map_plot +
+    geom_point(data=as.data.frame(pts), aes(long, lat, fill=(sqft_basement/sqft_living)) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Part du\nsous-sol")
+)
 ```
-
-
-
-## Autres
-
-
-
