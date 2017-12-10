@@ -470,11 +470,13 @@ plot_grid(
     affiche_lorentz(M$sqft_living) +
     draw_plot(ggplot(M) +
               geom_histogram(aes(sqft_living)) +
-              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5),
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5) +
+    ggtitle("Initialement"),
     affiche_lorentz(M$sqft_living15) +
     draw_plot(ggplot(M) +
               geom_histogram(aes(sqft_living15)) +
-              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5)
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5) +
+    ggtitle("En 2015")
 )
 ```
 
@@ -484,11 +486,13 @@ plot_grid(
     affiche_lorentz(M$sqft_lot) +
     draw_plot(ggplot(M) +
               geom_histogram(aes(sqft_lot)) +
-              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5),
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5) +
+    ggtitle("Initialement"),
     affiche_lorentz(M$sqft_lot15) +
     draw_plot(ggplot(M) +
               geom_histogram(aes(sqft_lot15)) +
-              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5)
+              theme(axis.text=element_text(size=5)), 0.5, 0, 0.5, 0.5) +
+    ggtitle("En 2015")
 )
 ```
 
@@ -580,7 +584,7 @@ plot_grid(
     M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
 )
 ```
-Une valeur anormalement grande a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+Une point a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 ### Lien entre aménagement de la surface intérieure et extérieure
 ```{r}
@@ -597,7 +601,7 @@ plot_grid(
     M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
 )
 ```
-Une valeur anormalement grande a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+Un point a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 ### Harmonisation de la surface intérieure et la surface extérieure
 
@@ -621,8 +625,12 @@ Inertie_table %>% kable(caption = "Variation inertie par axe") %>%
 
 ### Grade et variation relative
 ```{r}
-ggplot(M) + geom_point(aes(grade, (sqft_living15 - sqft_living)), alpha=0.1)
+plot_grid(
+ggplot(M) + geom_point(aes(grade, (sqft_living15 - sqft_living)), alpha=0.1),
+ggplot(M) + geom_point(aes(grade, (sqft_lot15 - sqft_lot)), alpha=0.1)
+)
 ```
+
 
 ## Impact des caractéristiques du logement sur le prix
 ### Surface habitable
@@ -640,7 +648,7 @@ plot_grid(
     M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot, log10(price)))
 )
 ```
-Une valeur anormalement grande a été retiré du second graphe en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+Un point a été retiré du second graphe en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 
 ### Surface du sous-sol et supérieure
@@ -687,7 +695,10 @@ M %>% ggplot()+ geom_point(aes(yr_renovated, log10(price)))
 
 #### Date de vente
 ```{r}
-M %>% ggplot()+ geom_boxplot(aes(cut(date, "month"), log10(price)))
+M %>% ggplot()+ geom_boxplot(aes(format(as.Date(cut(M$date, "month")), "%B"),
+                                 log10(price))) +
+    theme(axis.text=element_text(size=8)) +
+    xlab("Date")
 ```
 
 ### Réaménagements
@@ -761,7 +772,7 @@ price_ream_lot15 <- M %>% ggplot() + geom_point(aes(sqft_lot15, log10(price),
 plot_grid(price_ream_lot, price_ream_lot15,get_legend(price_ream_lot_w_legend), nrow=1, hjust = -1, rel_widths = c(2, 2, .5))
 ```
 
-Une valeur anormalement grande a été retiré du premier graphe en raison d'une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+Un point a été retiré du premier graphe en raison d'une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
 
 ## Liens entre taille du logement et caractéristiques
 ### Surface habitée
@@ -871,12 +882,26 @@ ggplot(melt(contrib_df),
 ```
 
 ### Projection des élements sur le plan d'inertie maximum
+
 ```{r}
-pca_ind <- data.frame(x=pca$ind$coord[,1], y=pca$ind$coord[,2])
+pca_ind <- data.frame(x = pca$ind$coord[,1],
+                      y = pca$ind$coord[,2],
+                      distance = pca$ind$dist)
+
 ggplot(pca_ind) +
-    geom_point(aes(x,y), alpha=0.5) +
+    geom_point(aes(x,y, color=distance), alpha=0.5) +
+    scale_color_viridis(name = "Distance") +
     coord_fixed()
 ```
+
+### Valeurs extrêmes du nuage 
+
+```{r}
+map_plot +
+    geom_point(data=as.data.frame(pts), aes(long, lat, fill=pca$ind$dist) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Distance")
+```
+
 
 ## Logements au prix anormalement bas
 
@@ -913,9 +938,7 @@ res_map <- map_plot + geom_point(data=as.data.frame(pts), aes(long, lat,
                                  shape = 23, alpha = 0.5, size = 2) +
     scale_fill_brewer(name = "Résidus", palette = "Set1")
 
-plot_grid(
-plot_grid(
-    ggplot(regression) + geom_point(aes(regression$fitted.values,
+res_point <-  ggplot(regression) + geom_point(aes(regression$fitted.values,
                                     regression$residuals,
                                     color=cut(regression$residuals,
                                               breaks=c(-Inf,
@@ -924,6 +947,11 @@ plot_grid(
                                                        0.1,
                                                        0.2,
                                                        Inf)))) +
+    scale_color_brewer(name = "Résidus", palette = "Set1")
+
+plot_grid(
+plot_grid(
+    res_point + 
     theme(legend.position = "none"),
     res_map + theme(legend.position = "none"),
     align = "vh",
@@ -934,6 +962,7 @@ get_legend(res_map),
 ncol = 1,
 rel_heights = c(1, .2)
 )
+
 ```
 
 ## Autres remarques
