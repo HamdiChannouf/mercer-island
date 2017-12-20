@@ -1,0 +1,228 @@
+## Réaménagements
+### Surface Habitable
+```{r}
+#M %>% ggplot() + geom_point(aes(sqft_living, sqft_living15))
+plot_grid(
+    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living)/sqft_living))+ ggtitle("Absolu"),
+    M %>% ggplot() + geom_histogram(aes((sqft_living15 - sqft_living))) + ggtitle("Relatif")
+)
+
+a_abs <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_living15 - sqft_living)/sqft_living,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_living15 - sqft_living)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs, a_rel)
+
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes(sqft_living , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
+)
+
+```
+
+### Surface du terrain
+```{r}
+# Rien à faire ici
+# M %>% ggplot() + geom_point(aes(sqft_lot15, sqft_living15))
+# M %>% ggplot() + geom_point(aes(sqft_lot, sqft_living))
+
+plot_grid(
+    M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot)/sqft_lot))+ ggtitle("Absolu"),
+    M %>% ggplot() + geom_histogram(aes((sqft_lot15 - sqft_lot))) + ggtitle("Relatif")
+)
+
+
+a_abs_lot <- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                     fill=cut((sqft_lot15 - sqft_lot)/sqft_lot,
+                                                               breaks=c(-Inf,
+                                                                        -1,
+                                                                        -0.5,
+                                                                        -0.1,
+                                                                        0.1,
+                                                                        0.5,
+                                                                        1,
+                                                                        Inf)
+                                                               )),
+                                                     shape=23, size=2, alpha=0.5) +
+    scale_fill_brewer(name = "Aménagement\nabsolu", palette = "Set1", guide = guide_legend(title = "Aménagement\nabsolu"))
+
+a_rel_lot<- map_plot +  geom_point(data = as.data.frame(pts), aes(long,lat,
+                                                                fill=(sqft_lot15 - sqft_lot)),
+                                 shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Aménagement\nrelatif")
+
+plot_grid(a_abs_lot, a_rel_lot)
+
+plot_grid(
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + ggtitle("Absolu"),
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_lot15 - sqft_lot)), alpha=0.5) + ggtitle("Relatif")
+)
+```
+Une point a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+
+### Lien entre aménagement de la surface intérieure et extérieure
+```{r}
+plot_grid(
+    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living)/sqft_living ,(sqft_lot15 - sqft_lot)/sqft_lot), alpha=0.5) + geom_abline(slope = 1, color="red") + coord_fixed() + ggtitle("Absolu"),
+    M %>% ggplot() + geom_point(aes((sqft_living15 - sqft_living),(sqft_lot15 - sqft_lot)), alpha=0.5) + geom_abline(slope = 1, color="red") + coord_fixed(0.1) + ggtitle("Relatif")
+)
+```
+
+### Lien entre aménagement de la surface intérieure et surface initiale du terrain
+```{r}
+plot_grid(
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)/sqft_living), alpha=0.5) + ggtitle("Absolu"),
+    M %>% filter(sqft_lot < 75000) %>% ggplot() + geom_point(aes(sqft_lot , (sqft_living15 - sqft_living)), alpha=0.5) + ggtitle("Relatif")
+)
+```
+Un point a été retiré en raison d’une valeur de $sqft\_lot$ très éloignée du nuage (supérieur à 75000).
+
+### Harmonisation de la surface intérieure et la surface extérieure
+
+```{r}
+InertieM <- (M %>% select(sqft_living, sqft_lot) %>% cov)*(nrow(M)-1)
+Inertie15M <- (M %>% select(sqft_living15, sqft_lot15) %>% cov)*(nrow(M)-1)
+
+Inertie_table <- rbind(diag(InertieM), diag(Inertie15M))
+rownames(Inertie_table) <- c("Avant 2015", "2015")
+
+Inertie_table <- formatC(Inertie_table, format="e", digits=2)
+
+plot_grid(
+    M %>% ggplot() + geom_point(aes(sqft_living, sqft_lot)),
+    M %>% ggplot() + geom_point(aes(sqft_living15, sqft_lot15))
+)
+
+Inertie_table %>% kable(caption = "Variation inertie par axe") %>%
+    kable_styling("striped", full_width = F)
+```
+
+### Grade et variation relative
+```{r}
+plot_grid(
+    ggplot(M) + geom_point(aes(grade, (sqft_living15 - sqft_living)), alpha=0.1),
+    ggplot(M) + geom_point(aes(grade, (sqft_lot15 - sqft_lot)), alpha=0.1)
+)
+```
+
+### Projection des élements sur le plan d'inertie maximum
+
+```{r}
+pca_ind <- data.frame(x = pca$ind$coord[,1],
+                      y = pca$ind$coord[,2],
+                      distance = pca$ind$dist)
+
+ggplot(pca_ind) +
+    geom_point(aes(x,y, color=distance), alpha=0.5) +
+    scale_color_viridis(name = "Distance") +
+    coord_fixed()
+```
+
+### Valeurs extrêmes du nuage 
+
+```{r}
+map_plot +
+    geom_point(data=as.data.frame(pts), aes(long, lat, fill=pca$ind$dist) ,shape=23, size=2, alpha=0.5) +
+    scale_fill_viridis(name = "Distance")
+```
+### Contribution des variables
+```{r}
+composantes <- names(pca$var$contrib[,1])
+
+contrib_df <- data.frame(variables = composantes,
+                  "Dim 1" = pca$var$contrib[,1],
+                  "Dim 2" = pca$var$contrib[,2])
+
+ggplot(melt(contrib_df),
+       aes(x = variables,
+           y = value,
+           fill = variable), xlab="Age Group") +
+    geom_bar(stat="identity", width=.5, position = "dodge") +
+    theme(axis.text=element_text(size=7)) + 
+    labs(fill = "Axes")
+
+## ggplot() +
+##     geom_bar(aes(x=variables, y=contribution), stat="identity") +
+##     theme(axis.text=element_text(size=7)) +
+##     ylim(0, 25) + 
+##     ggtitle("Dim 1")
+## ggplot(data.frame(variables = composantes,
+##                   contribution = pca$var$contrib[,2])) +
+##     geom_bar(aes(x=variables , y=contribution), stat="identity") +
+##     theme(axis.text=element_text(size=7)) +
+##     ylim(0, 25) + 
+##     ggtitle("Dim 2")
+```
+
+## Impact des caractéristiques du logement sur le prix
+
+Toutes les variables présentées ici ont un effet positif sur le log décimal 
+du prix.
+On remarque que cette effet peut être linéairement approximé pour 
+
+view
+:   Qualité de l'estimation de l'assesseur lors de sa visite [Discret]
+
+sqft-living2015
+:   Moyenne des 15 logements les plus proches [Continu]
+
+sqft-lot2015
+:   Moyenne des 15 logements les plus proches [Continu]
+
+### Impact de la surface habitable chez les voisins
+```{r}
+M %>% ggplot() + geom_point(aes(sqft_living15, log10(price),
+                                color=cut((sqft_living15 - sqft_living)/sqft_living,
+                                          breaks=c(-Inf,
+                                                   -1,
+                                                   -0.5,
+                                                   -0.1,
+                                                   0.1,
+                                                   0.5,
+                                                   1,
+                                                   Inf)
+                                          )),
+                            alpha = 0.5) +
+    scale_color_brewer(palette = "Set1", guide = guide_legend(title = "Différence\nabsolue"))
+```
+
+On constate que les logements qui sont dans des zones où la taille moyenne des logements est 
+élevé ont tendance à valoir beaucoup plus chers (les points rouges et bleus sont au dessus
+du graphe). L'effet contraire se retrouve également.
+
+### Surface des voisins
+#### Grade
+```{r}
+    M %>% ggplot() + geom_boxplot(aes(grade, sqft_living15))
+```
+
+Les logements luxueux ont tendance à être localisée dans des zones
+où les logements sont grands. On voit bien ici que le voisinage a 
+un impact direct sur les qualités intrasèques du logement.
+
+#### Qualité de l'estimation
+```{r}
+M %>% ggplot() + geom_boxplot(aes(factor(view), log10(price)))
+
+```
+## Lien entre année de rénovation et année de construction
+```{r}
+M %>% ggplot()+ geom_point(aes(yr_built, yr_renovated))
+```
+
+On constate 
