@@ -57,7 +57,7 @@ M %>% select(-view, -sqft_living15, -sqft_lot15) -> M
 
 ## Introduction
 
-Nous allons étudier un jeu de données immobilières. Il s'agit des ventes de logements à King County, compté contenant la ville de Seattle aux États-Unis. Ce jeu de donnée a été utilisé par un cours Coursera, il semblait tout à fait convenir à une introduction à diverses techniques de l'analyse et traitement de données, sachant l'extreme diversité des méthodes à utiliser, même pour des données modestes. Parmi les avantages de cet ensemble de données, déjà mise en forme, pas d'imputation de données nécessaires, peu de facteurs, une application possible d'une régression linéaire sans être obligé d'utiliser des modèles complexes.
+Nous allons étudier un jeu de données immobilières. Il s'agit des ventes de logements à King County, compté contenant la ville de Seattle aux États-Unis. Ce jeu de donnée a été utilisé par un cours Coursera, il semblait tout à fait convenir à une introduction à diverses techniques de l'analyse et traitement de données, sachant l'extrême diversité des méthodes à utiliser, même pour des données modestes. Parmi les avantages de cet ensemble de données, déjà mise en forme, pas d'imputation de données nécessaires, peu de facteurs, une application possible d'une régression linéaire sans être obligé d'utiliser des modèles complexes.
 
 L'objectif de ce projet est d'analyser l'ensemble de donnée avant de faire une modélisation par régression linéaire, cette analyse est une étape indispensable pour développer une intuition sur l'ensemble de données, et donc la création de modèle.
 
@@ -495,7 +495,7 @@ Il en va de même pour le nombre de chambre.
 M %>% ggplot() + geom_boxplot(aes(grade, log10(price)))
 ```
 
-Les maisons jugées luxueuses vont être vendus généralement plus cher que 
+Les maisons jugées luxueuses vont être vendues généralement plus chères que 
 celles qui sont plus austères. 
 
 ### Temps
