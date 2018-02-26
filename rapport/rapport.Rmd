@@ -1,7 +1,7 @@
 ---
 title: Analyse de Données
 subtitle: Étude immobilière de l'île Mercer (Washington, USA)
-author: Louie l'orang-outan
+author: Robert Dazi
 output:
    rmdformats::readthedown:
       highlight: kate
