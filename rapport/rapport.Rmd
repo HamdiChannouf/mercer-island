@@ -1,7 +1,7 @@
 ---
 title: Analyse de Données
 subtitle: Étude immobilière de l'île Mercer (Washington, USA)
-author: Robert Dazi
+author: Robert Dazi, Samuel Amoyal et Arnaud Kazemi
 output:
    rmdformats::readthedown:
       highlight: kate
